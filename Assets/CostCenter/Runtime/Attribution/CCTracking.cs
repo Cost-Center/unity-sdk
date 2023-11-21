@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Web;
 using UnityEngine;
 using UnityEngine.Networking;
 using Ugi.PlayInstallReferrerPlugin;
@@ -44,12 +43,10 @@ namespace CostCenter.Attribution {
             string platform = Application.platform == RuntimePlatform.Android ? "android" : "ios";
             string fbAppInstanceId = task.Result;
 
-            string url = "https://attribution.costcenter.net/appopen";
-            var uriBuilder = new UriBuilder(url);
-            var query = HttpUtility.ParseQueryString(uriBuilder.Query);
-            query["bundle_id"] = bundleId;
-            query["platform"] = platform;
-            query["firebase_app_instance_id"] = fbAppInstanceId;
+            string url = "https://attribution.costcenter.net/appopen?";
+            url += $"bundle_id={bundleId}";
+            url += $"&platform={platform}";
+            url += $"&firebase_app_instance_id={fbAppInstanceId}";
             
             // ANDROID INSTALL REFERRER
             _installReferrerInfo = null;
@@ -62,12 +59,9 @@ namespace CostCenter.Attribution {
             #endif
             if (_installReferrerInfo != null) {
                 foreach (KeyValuePair<string, object> info in _installReferrerInfo) {
-                    query[info.Key] = info.Value.ToString();
+                    url += $"&{info.Key}={info.Value.ToString()}";
                 }
             }
-
-            uriBuilder.Query = query.ToString();
-            url = uriBuilder.Uri.AbsoluteUri;
 
             UnityWebRequest www = UnityWebRequest.Get(url);
             yield return www.SendWebRequest();
