@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace CostCenter.Attribution
 {
@@ -7,17 +8,11 @@ namespace CostCenter.Attribution
     {
         void Start()
         {
-            StartCoroutine(WaitToTracking());
-        }
-
-        private IEnumerator WaitToTracking() {
-            Debug.Log(CCFirebase.IsInitialized);
-            yield return new WaitUntil(() => CCFirebase.IsInitialized);
             if (CCTracking.IsFirstOpen) {
-                yield return StartCoroutine(CCTracking.CallAppOpen());
-
+                StartCoroutine(CCTracking.AppOpen());
                 CCTracking.IsFirstOpen = false;
             }
         }
+
     }
 }

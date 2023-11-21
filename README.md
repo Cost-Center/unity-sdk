@@ -17,7 +17,7 @@ Find the manifest.json file in the Packages folder of your project and edit it t
      },
     }
 To update the package, change suffix  `#{version}`  to the target version.
--   e.g.  `"https://github.com/Cost-Center/cc-sdk.git?path=/Assets/CostCenter#v1.2.3"`
+-   e.g.  `"https://github.com/Cost-Center/cc-sdk.git?path=/Assets/CostCenter#v1.1.0"`
 
 #### For Unity 2018.2 or earlier
 1.  Download a source code zip file from  [Releases](https://github.com/Cost-Center/cc-sdk/releases)  page

@@ -1,5 +1,5 @@
 {
-    "name": "CostCenter_Editor",
+    "name": "ExtraLabs.CostCenter.Editor",
     "rootNamespace": "",
     "references": [
         "GUID:343ecd298f3bf42df80292ede0c5a648"

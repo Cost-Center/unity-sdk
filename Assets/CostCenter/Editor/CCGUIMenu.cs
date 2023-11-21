@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 
-namespace CostCenter.GUI {
+namespace CostCenter.Editor {
     public static class CCGUIMenu
     {
         [MenuItem ("GameObject/Cost Center/Create Manager")]

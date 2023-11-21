@@ -1,9 +1,9 @@
 using UnityEngine;
 using UnityEditor;
 
-namespace CostCenter.GUI {
+namespace CostCenter.Editor {
     [CustomEditor(typeof(CCServices))]
-    public class CCServicesEditor : Editor
+    public class CCServicesEditor: UnityEditor.Editor
     {
         bool IsFoldout = false;
 
