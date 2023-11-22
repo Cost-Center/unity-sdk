@@ -11,10 +11,10 @@ Requirement [Firebase Unity SDK](https://firebase.google.com/docs/unity/setup):
 Find the manifest.json file in the Packages folder of your project and edit it to look like this:
 
     {
-     "dependencies": {
-     "costcenter-sdk": "https://github.com/Cost-Center/cc-sdk.git?path=/Assets/CostCenter#{version}",
-     ...
-     },
+        "dependencies": {
+            "costcenter-sdk": "https://github.com/Cost-Center/cc-sdk.git?path=/Assets/CostCenter#{version}",
+            ...
+        },
     }
 To update the package, change suffix  `#{version}`  to the target version.
 -   e.g.  `"https://github.com/Cost-Center/cc-sdk.git?path=/Assets/CostCenter#v1.1.0"`
@@ -27,7 +27,7 @@ To update the package, change suffix  `#{version}`  to the target version.
 ## How to use
  - Select `GameObject/Cost Center/Create Manager`  from Unity menu
  - A new manager game object will be added to current `Scene`
- - Select new game object, click `Add Attribution` in CCServices/Add Services
+ - Select new game object, click `Add Attribution` in CCServices
 
 ## License
 -   ExtraLabs
