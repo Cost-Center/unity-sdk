@@ -59,7 +59,10 @@ namespace CostCenter.Attribution {
             #endif
             if (_installReferrerInfo != null) {
                 foreach (KeyValuePair<string, object> info in _installReferrerInfo) {
-                    url += $"&{info.Key}={info.Value.ToString()}";
+                    string value = $"{info.Key}" == "install_referrer"
+                        ? UnityWebRequest.EscapeURL(info.Value.ToString())
+                        : info.Value.ToString();
+                    url += $"&{info.Key}={value}";
                 }
             }
 
