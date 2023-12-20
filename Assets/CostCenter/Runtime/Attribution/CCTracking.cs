@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.Networking;
 using Ugi.PlayInstallReferrerPlugin;
@@ -32,6 +33,9 @@ namespace CostCenter.Attribution {
         }
 
         private static Dictionary<string, object> _installReferrerInfo = null;
+
+        [DllImport ("__Internal")]
+	    private static extern string _GetAttributionToken();
 
         internal static IEnumerator AppOpen()
         {
@@ -65,6 +69,14 @@ namespace CostCenter.Attribution {
                     url += $"&{info.Key}={value}";
                 }
             }
+
+            // IOS ATTRIBUTION TOKEN
+            #if UNITY_IOS && !UNITY_EDITOR
+                string attributionToken = _GetAttributionToken();
+                if (!string.IsNullOrEmpty(attributionToken)) {
+                    url += $"&attribution_token={attributionToken}";
+                }
+            #endif
 
             UnityWebRequest www = UnityWebRequest.Get(url);
             yield return www.SendWebRequest();
