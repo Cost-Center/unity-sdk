@@ -74,7 +74,7 @@ namespace CostCenter.Attribution {
             #if UNITY_IOS && !UNITY_EDITOR
                 string attributionToken = _GetAttributionToken();
                 if (!string.IsNullOrEmpty(attributionToken)) {
-                    url += $"&attribution_token={attributionToken}";
+                    url += $"&attribution_token={UnityWebRequest.EscapeURL(attributionToken)}";
                 }
             #endif
 
