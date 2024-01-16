@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+#if UNITY_IOS && !UNITY_EDITOR
 using System.Runtime.InteropServices;
+#endif
 using UnityEngine;
 using UnityEngine.Networking;
 using Ugi.PlayInstallReferrerPlugin;
@@ -34,23 +36,30 @@ namespace CostCenter.Attribution {
 
         private static Dictionary<string, object> _installReferrerInfo = null;
 
+        #if UNITY_IOS && !UNITY_EDITOR
         [DllImport ("__Internal")]
 	    private static extern string _GetAttributionToken();
+        #endif
 
-        internal static IEnumerator AppOpen()
+        internal static IEnumerator AppOpen(string firebaseAppInstanceId = null, float delayTime = 1.0f)
         {
-            yield return new WaitUntil(() => CCFirebase.IsInitialized);
-            System.Threading.Tasks.Task<string> task = Firebase.Analytics.FirebaseAnalytics.GetAnalyticsInstanceIdAsync();
-            yield return new WaitUntil(() => task.IsCompleted);
+            yield return new WaitForSeconds(delayTime);
+            string fbAppInstanceId = firebaseAppInstanceId;
+            if (string.IsNullOrEmpty(fbAppInstanceId)) {
+                System.Threading.Tasks.Task<string> task = Firebase.Analytics.FirebaseAnalytics.GetAnalyticsInstanceIdAsync();
+                yield return new WaitUntil(() => task.IsCompleted);
+                fbAppInstanceId = task.Result;
+            }
 
             string bundleId = Application.identifier;
             string platform = Application.platform == RuntimePlatform.Android ? "android" : "ios";
-            string fbAppInstanceId = task.Result;
 
             string url = "https://attribution.costcenter.net/appopen?";
             url += $"bundle_id={bundleId}";
             url += $"&platform={platform}";
-            url += $"&firebase_app_instance_id={fbAppInstanceId}";
+            if (!string.IsNullOrEmpty(fbAppInstanceId)) {
+                url += $"&firebase_app_instance_id={fbAppInstanceId}";
+            }
             
             // ANDROID INSTALL REFERRER
             _installReferrerInfo = null;

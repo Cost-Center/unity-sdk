@@ -8,11 +8,16 @@ namespace CostCenter {
     {
         public static CCFirebase instance;
 
+        [SerializeField] private bool _autoInit = true;
+
         public static bool IsInitialized {
             private set;
             get;
         }
         private const float RetryInitDelayTime = 60.0f;
+
+        // Listener
+        public static System.Action OnFirebaseInitialized;
 
         private void Awake() {
             instance = this;
@@ -21,7 +26,13 @@ namespace CostCenter {
         // Start is called before the first frame update
         void Start()
         {
-            StartCoroutine("InitFirebaseApp");
+            if (_autoInit) {
+                Initialize();
+            }
+        }
+
+        public void Initialize() {
+            StartCoroutine(InitFirebaseApp());
         }
 
         private IEnumerator InitFirebaseApp() {
@@ -33,19 +44,19 @@ namespace CostCenter {
                 } catch(System.Exception e) {
                     Debug.LogError("CCFirebase: InitFirebaseApp failed.");
                     Debug.LogError(e);
-                    OnFirebaseInitialized(false);
+                    OnInitialized(false);
                 }
                 if (task != null) {
                     yield return new WaitUntil(() => task.IsCompleted);
                     var dependencyStatus = task.Result;
                     if (dependencyStatus == Firebase.DependencyStatus.Available) {
                         // Debug.Log("CCFirebase: InitFirebaseApp success");
-                        OnFirebaseInitialized(true);
+                        OnInitialized(true);
                     } else {
                         Debug.LogError(System.String.Format(
                         "Could not resolve all Firebase dependencies: {0}", dependencyStatus));
                         // Firebase Unity SDK is not safe to use here.
-                        OnFirebaseInitialized(false);
+                        OnInitialized(false);
                         yield return new WaitForSeconds(RetryInitDelayTime);
                     }
                 } else {
@@ -55,8 +66,11 @@ namespace CostCenter {
             }
         }
 
-        public void OnFirebaseInitialized(bool success) {
+        public void OnInitialized(bool success) {
             IsInitialized = success;
+            if (success) {
+                OnFirebaseInitialized?.Invoke();
+            }
         }
     }
 }
