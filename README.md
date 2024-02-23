@@ -1,5 +1,5 @@
-# Cost Center SDK
-Cost Center SDK is a close source attribution for Unity games using Firebase Analytics.
+# Cost Center Unity SDK
+Cost Center Unity SDK is a close source attribution for Unity games using Firebase Analytics.
 
 ## Getting Started
 Requirement [Firebase Unity SDK](https://firebase.google.com/docs/unity/setup):
