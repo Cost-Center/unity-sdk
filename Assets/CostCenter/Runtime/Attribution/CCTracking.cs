@@ -33,12 +33,20 @@ namespace CostCenter.Attribution {
                 PlayerPrefs.SetInt(CCConstant.FIRST_OPEN_KEY, lastFirst - 1);
             }
         }
+        internal static bool IsTrackedATT {
+            get {
+                return PlayerPrefs.GetInt(CCConstant.TRACKED_ATT_KEY, 0) == 1;
+            }
+            set {
+                PlayerPrefs.SetInt(CCConstant.TRACKED_ATT_KEY, value ? 1 : 0);
+            }
+        }
 
         private static Dictionary<string, object> _installReferrerInfo = null;
 
         #if UNITY_IOS && !UNITY_EDITOR
         [DllImport ("__Internal")]
-	    private static extern string _GetAttributionToken();
+	    private static extern string _CCGetAttributionToken();
         #endif
 
         internal static IEnumerator AppOpen(string firebaseAppInstanceId = null, float delayTime = 1.0f)
@@ -81,7 +89,7 @@ namespace CostCenter.Attribution {
 
             // IOS ATTRIBUTION TOKEN
             #if UNITY_IOS && !UNITY_EDITOR
-                string attributionToken = _GetAttributionToken();
+                string attributionToken = _CCGetAttributionToken();
                 if (!string.IsNullOrEmpty(attributionToken)) {
                     url += $"&attribution_token={UnityWebRequest.EscapeURL(attributionToken)}";
                 }
@@ -151,6 +159,78 @@ namespace CostCenter.Attribution {
             //     Debug.Log("Google Play instant: " + installReferrerDetails.GooglePlayInstant);
             // }
             _installReferrerInfo = result;
+        }
+
+        internal static IEnumerator TrackATT(string firebaseAppInstanceId = null, float delayTime = 2.0f)
+        {
+            yield return new WaitForSeconds(delayTime);
+
+            string idfa = GetIDFA();
+            Debug.Log($"CC Tracking IDFA: {idfa}");
+            if (string.IsNullOrEmpty(idfa) || idfa == "00000000-0000-0000-0000-000000000000") {
+                yield break;
+            }
+
+            string fbAppInstanceId = firebaseAppInstanceId;
+            if (string.IsNullOrEmpty(fbAppInstanceId)) {
+                System.Threading.Tasks.Task<string> task = Firebase.Analytics.FirebaseAnalytics.GetAnalyticsInstanceIdAsync();
+                yield return new WaitUntil(() => task.IsCompleted);
+                fbAppInstanceId = task.Result;
+            }
+
+            string bundleId = Application.identifier;
+            string platform = Application.platform == RuntimePlatform.Android ? "android" : "ios";
+
+            string url = "https://attribution.costcenter.net/appopen?";
+            url += $"bundle_id={bundleId}";
+            url += $"&platform={platform}";
+            if (!string.IsNullOrEmpty(fbAppInstanceId)) {
+                url += $"&firebase_app_instance_id={fbAppInstanceId}";
+            }
+            url += $"&vendor_id={UnityWebRequest.EscapeURL(SystemInfo.deviceUniqueIdentifier)}";
+            url += $"&advertising_id={UnityWebRequest.EscapeURL(idfa)}";
+
+            // Debug.Log($"CC Tracking URL: {url}");
+            UnityWebRequest www = UnityWebRequest.Get(url);
+            yield return www.SendWebRequest();
+
+            if (www.isNetworkError || www.isHttpError) {
+                Debug.Log(www.error);
+            } else {
+                Debug.Log("CCAttribution TrackATT: success");
+                IsTrackedATT = true;
+            }
+
+        }
+
+        #if UNITY_IOS && !UNITY_EDITOR
+        [DllImport ("__Internal")]
+	    private static extern string _CCGetIDFA();
+        #endif
+        public static string GetIDFA()
+        {
+            string advertisingID = "";
+            #if UNITY_ANDROID && !UNITY_EDITOR
+                try
+                {
+                    AndroidJavaClass up = new AndroidJavaClass ("com.unity3d.player.UnityPlayer");
+                    AndroidJavaObject currentActivity = up.GetStatic<AndroidJavaObject> ("currentActivity");
+                    AndroidJavaClass client = new AndroidJavaClass ("com.google.android.gms.ads.identifier.AdvertisingIdClient");
+                    AndroidJavaObject adInfo = client.CallStatic<AndroidJavaObject> ("getAdvertisingIdInfo", currentActivity);
+            
+                    advertisingID = adInfo.Call<string> ("getId").ToString();  
+                }
+                catch (Exception)
+                {
+                }
+                
+            #elif UNITY_IOS && !UNITY_EDITOR
+                string idfa = _CCGetIDFA();
+                if (!string.IsNullOrEmpty(idfa)) {
+                    advertisingID = idfa;
+                }
+            #endif
+            return advertisingID;
         }
     }
 }

@@ -1,5 +1,8 @@
 using UnityEngine;
 using Firebase.Extensions;
+#if UNITY_IOS && !UNITY_EDITOR
+using System.Runtime.InteropServices;
+#endif
 
 namespace CostCenter.Attribution
 {
@@ -25,6 +28,22 @@ namespace CostCenter.Attribution
                 ));
                 CCTracking.IsFirstOpen = false;
             }
+            if (!CCTracking.IsTrackedATT) {
+                StartCoroutine(CCTracking.TrackATT(
+                    firebaseAppInstanceId: firebaseAppInstanceId,
+                    delayTime: 2.0f
+                ));
+            }
+        }
+
+        #if UNITY_IOS && !UNITY_EDITOR
+        [DllImport ("__Internal")]
+	    private static extern void _CCRequestTrackingAuthorization();
+        #endif
+        public static void RequestAppTrackingTransparency() {
+            #if UNITY_IOS && !UNITY_EDITOR
+                _CCRequestTrackingAuthorization();
+            #endif
         }
     }
 }
