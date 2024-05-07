@@ -68,6 +68,7 @@ namespace CostCenter.Attribution {
             if (!string.IsNullOrEmpty(fbAppInstanceId)) {
                 url += $"&firebase_app_instance_id={fbAppInstanceId}";
             }
+            url += $"&vendor_id={UnityWebRequest.EscapeURL(SystemInfo.deviceUniqueIdentifier)}";
             
             // ANDROID INSTALL REFERRER
             _installReferrerInfo = null;
