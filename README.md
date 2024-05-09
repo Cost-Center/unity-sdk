@@ -12,15 +12,15 @@ Find the manifest.json file in the Packages folder of your project and edit it t
 
     {
         "dependencies": {
-            "costcenter-sdk": "https://github.com/Cost-Center/cc-sdk.git?path=/Assets/CostCenter#{version}",
+            "costcenter-sdk": "https://github.com/Cost-Center/unity-sdk.git?path=/Assets/CostCenter#{version}",
             ...
         },
     }
 To update the package, change suffix  `#{version}`  to the target version.
--   e.g.  `"https://github.com/Cost-Center/cc-sdk.git?path=/Assets/CostCenter#v1.1.0"`
+-   e.g.  `"https://github.com/Cost-Center/unity-sdk.git?path=/Assets/CostCenter#v1.1.0"`
 
 #### For Unity 2018.2 or earlier
-1.  Download a source code zip file from  [Releases](https://github.com/Cost-Center/cc-sdk/releases)  page
+1.  Download a source code zip file from  [Releases](https://github.com/Cost-Center/unity-sdk/releases)  page
 2.  Extract it
 3.  Import it into the following directory in your Unity project
 
@@ -33,6 +33,6 @@ To update the package, change suffix  `#{version}`  to the target version.
 -   ExtraLabs
 
 ## See Also
--   Git page :  [https://github.com/Cost-Center/cc-sdk](https://github.com/Cost-Center/cc-sdk)
--   Releases :  [https://github.com/Cost-Center/cc-sdk/releases](https://github.com/Cost-Center/cc-sdk/releases)
--   Change log :  [https://github.com/Cost-Center/cc-sdk/blob/master/CHANGELOG.md](https://github.com/Cost-Center/cc-sdk/blob/master/CHANGELOG.md)
+-   Git page :  [https://github.com/Cost-Center/unity-sdk](https://github.com/Cost-Center/unity-sdk)
+-   Releases :  [https://github.com/Cost-Center/unity-sdk/releases](https://github.com/Cost-Center/unity-sdk/releases)
+-   Change log :  [https://github.com/Cost-Center/unity-sdk/blob/master/CHANGELOG.md](https://github.com/Cost-Center/unity-sdk/blob/master/CHANGELOG.md)
