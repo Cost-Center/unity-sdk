@@ -68,7 +68,10 @@ namespace CostCenter.Attribution {
             if (!string.IsNullOrEmpty(fbAppInstanceId)) {
                 url += $"&firebase_app_instance_id={fbAppInstanceId}";
             }
-            url += $"&vendor_id={UnityWebRequest.EscapeURL(SystemInfo.deviceUniqueIdentifier)}";
+            url += $"&vendor_id={UnityWebRequest.EscapeURL(GetIDFV())}";
+            #if UNITY_ANDROID && !UNITY_EDITOR
+                url += $"&advertising_id={UnityWebRequest.EscapeURL(GetIDFA())}";
+            #endif
             
             // ANDROID INSTALL REFERRER
             _installReferrerInfo = null;
@@ -95,6 +98,8 @@ namespace CostCenter.Attribution {
                     url += $"&attribution_token={UnityWebRequest.EscapeURL(attributionToken)}";
                 }
             #endif
+
+            Debug.Log($"CC Tracking AppOpen: {url}");
 
             UnityWebRequest www = UnityWebRequest.Get(url);
             yield return www.SendWebRequest();
@@ -188,17 +193,18 @@ namespace CostCenter.Attribution {
             if (!string.IsNullOrEmpty(fbAppInstanceId)) {
                 url += $"&firebase_app_instance_id={fbAppInstanceId}";
             }
-            url += $"&vendor_id={UnityWebRequest.EscapeURL(SystemInfo.deviceUniqueIdentifier)}";
+            url += $"&vendor_id={UnityWebRequest.EscapeURL(GetIDFV())}";
             url += $"&advertising_id={UnityWebRequest.EscapeURL(idfa)}";
 
-            // Debug.Log($"CC Tracking URL: {url}");
+            Debug.Log($"CC Tracking ATT url: {url}");
+
             UnityWebRequest www = UnityWebRequest.Get(url);
             yield return www.SendWebRequest();
 
             if (www.isNetworkError || www.isHttpError) {
                 Debug.Log(www.error);
             } else {
-                Debug.Log("CCAttribution TrackATT: success");
+                Debug.Log("CC Tracking ATT: success");
                 IsTrackedATT = true;
             }
 
@@ -219,10 +225,11 @@ namespace CostCenter.Attribution {
                     AndroidJavaClass client = new AndroidJavaClass ("com.google.android.gms.ads.identifier.AdvertisingIdClient");
                     AndroidJavaObject adInfo = client.CallStatic<AndroidJavaObject> ("getAdvertisingIdInfo", currentActivity);
             
-                    advertisingID = adInfo.Call<string> ("getId").ToString();  
+                    advertisingID = adInfo.Call<string> ("getId").ToString();
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    Debug.Log($"CC Tracking GetIDFA Android: {e.ToString()}");
                 }
                 
             #elif UNITY_IOS && !UNITY_EDITOR
@@ -232,6 +239,24 @@ namespace CostCenter.Attribution {
                 }
             #endif
             return advertisingID;
+        }
+
+        public static string GetIDFV() {
+            // #if UNITY_ANDROID && !UNITY_EDITOR
+            // try
+            // {
+            //     AndroidJavaClass up = new AndroidJavaClass ("com.unity3d.player.UnityPlayer");
+            //     AndroidJavaObject currentActivity = up.GetStatic<AndroidJavaObject> ("currentActivity");
+            //     AndroidJavaObject contentResolver = currentActivity.Call<AndroidJavaObject> ("getContentResolver");  
+            //     AndroidJavaClass secure = new AndroidJavaClass ("android.provider.Settings$Secure");
+            //     return secure.CallStatic<string> ("getString", contentResolver, "android_id");
+            // }
+            // catch (Exception e)
+            // {
+            //     Debug.Log($"CC Tracking GetIDFV Android: {e.ToString()}");
+            // }
+            // #endif
+            return SystemInfo.deviceUniqueIdentifier;
         }
     }
 }

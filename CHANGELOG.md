@@ -1,5 +1,9 @@
 # Cost Center SDK Change Log
 
+## v1.1.1
+- Update tracking logic
+- Fix minor bugs
+
 ## v1.1.0
 - Add tracking Android install referrer
 - Add tracking iOS attribution token

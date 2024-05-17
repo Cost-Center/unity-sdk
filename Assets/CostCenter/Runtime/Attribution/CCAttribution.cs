@@ -28,12 +28,14 @@ namespace CostCenter.Attribution
                 ));
                 CCTracking.IsFirstOpen = false;
             }
+            #if UNITY_IOS && !UNITY_EDITOR
             if (!CCTracking.IsTrackedATT) {
                 StartCoroutine(CCTracking.TrackATT(
                     firebaseAppInstanceId: firebaseAppInstanceId,
                     delayTime: 2.0f
                 ));
             }
+            #endif
         }
 
         #if UNITY_IOS && !UNITY_EDITOR

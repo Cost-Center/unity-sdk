@@ -79,6 +79,7 @@ namespace CostCenter.Editor {
     internal class AndroidManifest : AndroidXmlDocument
     {
         private const string INSTALL_REFERRER_PERMISSION_ATTR = "com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE";
+        private const string AD_ID_PERMISSION_ATTR = "com.google.android.gms.permission.AD_ID";
         private readonly XmlElement ApplicationElement;
 
         public AndroidManifest(string path) : base(path)
@@ -98,8 +99,8 @@ namespace CostCenter.Editor {
             var manifest = SelectSingleNode("/manifest");
             XmlElement child = CreateElement("uses-permission");
             manifest.AppendChild(child);
-            XmlAttribute newAttribute = CreateAndroidAttribute("name", INSTALL_REFERRER_PERMISSION_ATTR);
-            child.Attributes.Append(newAttribute);
+            child.Attributes.Append(CreateAndroidAttribute("name", INSTALL_REFERRER_PERMISSION_ATTR));
+            child.Attributes.Append(CreateAndroidAttribute("name", AD_ID_PERMISSION_ATTR));
         }
     }
 }

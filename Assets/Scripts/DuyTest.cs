@@ -14,6 +14,7 @@ public class DuyTest : MonoBehaviour
         // CCAttribution.RequestAppTrackingTransparency((idfa) => {
         //     _log.text = $"IDFA: {idfa}";
         // });
+        CCAttribution.instance.TrackingAttribution("duyid");
     }
 
     public void RequestATT() {
