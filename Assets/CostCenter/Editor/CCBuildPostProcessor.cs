@@ -7,7 +7,7 @@ using UnityEditor.iOS.Xcode;
 namespace CostCenter.Editor {
     public class CCBuildPostProcessor
     {
-
+        #if UNITY_IOS && !UNITY_EDITOR
         [PostProcessBuildAttribute(1)]
         public static void OnPostProcessBuild(BuildTarget target, string path)
         {
@@ -74,6 +74,6 @@ namespace CostCenter.Editor {
             // Disable bitcode
             // project.SetBuildProperty(targetGUID, "ENABLE_BITCODE", "false");
         }
-
+        #endif
     }
 }
