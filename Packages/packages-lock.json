@@ -1,5 +1,19 @@
 {
   "dependencies": {
+    "appsflyer-unity-plugin": {
+      "version": "https://github.com/AppsFlyerSDK/appsflyer-unity-plugin.git#v6.15.1",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "e8239e12511f417733b765c6c63239cb86676ca9"
+    },
+    "com.adjust.sdk": {
+      "version": "https://github.com/adjust/unity_sdk.git?path=/Assets/Adjust#v5.0.1",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "a7528f32be5b5b83c707e40952893adb0707b6cd"
+    },
     "com.google.external-dependency-manager": {
       "version": "file:../../firebase-sdk-unity/9.1.0/com.google.external-dependency-manager-1.2.171.tgz",
       "depth": 0,

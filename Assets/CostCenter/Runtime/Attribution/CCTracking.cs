@@ -41,8 +41,17 @@ namespace CostCenter.Attribution {
                 PlayerPrefs.SetInt(CCConstant.TRACKED_ATT_KEY, value ? 1 : 0);
             }
         }
+        internal static bool IsTrackedMMP {
+            get {
+                return PlayerPrefs.GetInt(CCConstant.TRACKED_MMP_KEY, 0) == 1;
+            }
+            set {
+                PlayerPrefs.SetInt(CCConstant.TRACKED_MMP_KEY, value ? 1 : 0);
+            }
+        }
 
         private static Dictionary<string, object> _installReferrerInfo = null;
+        private static string _firebaseAppInstanceId = string.Empty;
 
         #if UNITY_IOS && !UNITY_EDITOR
         [DllImport ("__Internal")]
@@ -52,11 +61,11 @@ namespace CostCenter.Attribution {
         internal static IEnumerator AppOpen(string firebaseAppInstanceId = null, float delayTime = 1.0f)
         {
             yield return new WaitForSeconds(delayTime);
-            string fbAppInstanceId = firebaseAppInstanceId;
-            if (string.IsNullOrEmpty(fbAppInstanceId)) {
+            _firebaseAppInstanceId = string.IsNullOrEmpty(firebaseAppInstanceId) ? _firebaseAppInstanceId : firebaseAppInstanceId;
+            if (string.IsNullOrEmpty(_firebaseAppInstanceId)) {
                 System.Threading.Tasks.Task<string> task = Firebase.Analytics.FirebaseAnalytics.GetAnalyticsInstanceIdAsync();
                 yield return new WaitUntil(() => task.IsCompleted);
-                fbAppInstanceId = task.Result;
+                _firebaseAppInstanceId = task.Result;
             }
 
             string bundleId = Application.identifier;
@@ -65,8 +74,8 @@ namespace CostCenter.Attribution {
             string url = "https://attribution.costcenter.net/appopen?";
             url += $"bundle_id={bundleId}";
             url += $"&platform={platform}";
-            if (!string.IsNullOrEmpty(fbAppInstanceId)) {
-                url += $"&firebase_app_instance_id={fbAppInstanceId}";
+            if (!string.IsNullOrEmpty(_firebaseAppInstanceId)) {
+                url += $"&firebase_app_instance_id={_firebaseAppInstanceId}";
             }
             url += $"&vendor_id={UnityWebRequest.EscapeURL(GetIDFV())}";
             #if UNITY_ANDROID && !UNITY_EDITOR
@@ -257,6 +266,45 @@ namespace CostCenter.Attribution {
             // }
             // #endif
             return SystemInfo.deviceUniqueIdentifier;
+        }
+
+        internal static IEnumerator TrackMMP(string attributionId, string firebaseAppInstanceId = null)
+        {
+            Firebase.Analytics.FirebaseAnalytics.SetUserProperty("attribution_id", attributionId);
+
+            _firebaseAppInstanceId = string.IsNullOrEmpty(firebaseAppInstanceId) ? _firebaseAppInstanceId : firebaseAppInstanceId;
+            if (string.IsNullOrEmpty(_firebaseAppInstanceId)) {
+                System.Threading.Tasks.Task<string> task = Firebase.Analytics.FirebaseAnalytics.GetAnalyticsInstanceIdAsync();
+                yield return new WaitUntil(() => task.IsCompleted);
+                _firebaseAppInstanceId = task.Result;
+            }
+
+            string bundleId = Application.identifier;
+            string platform = Application.platform == RuntimePlatform.Android ? "android" : "ios";
+
+            string url = "https://attribution.costcenter.net/appopen?";
+            url += $"bundle_id={bundleId}";
+            url += $"&platform={platform}";
+            if (!string.IsNullOrEmpty(_firebaseAppInstanceId)) {
+                url += $"&firebase_app_instance_id={_firebaseAppInstanceId}";
+            }
+            url += $"&vendor_id={UnityWebRequest.EscapeURL(GetIDFV())}";
+            #if UNITY_ANDROID && !UNITY_EDITOR
+                url += $"&advertising_id={UnityWebRequest.EscapeURL(GetIDFA())}";
+            #endif
+            url += $"&attribution_id={attributionId}";
+
+            Debug.Log($"CC Tracking MMP: {url}");
+
+            UnityWebRequest www = UnityWebRequest.Get(url);
+            yield return www.SendWebRequest();
+
+            if (www.isNetworkError || www.isHttpError) {
+                Debug.Log(www.error);
+            } else {
+                Debug.Log("CCAttribution CallTrackMMP: success");
+                IsTrackedMMP = true;
+            }
         }
     }
 }

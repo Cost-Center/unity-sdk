@@ -1,4 +1,7 @@
+using System;
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 using Firebase.Extensions;
 #if UNITY_IOS && !UNITY_EDITOR
 using System.Runtime.InteropServices;
@@ -19,6 +22,71 @@ namespace CostCenter.Attribution
                     TrackingAttribution(null);
                 };
             }
+
+            // if (CCTracking.IsFirstOpen)
+            // {
+            //     var adapter = initCurrentMMP();
+            //     if (adapter != null)
+            //     {
+            //         adapter.CheckAndGetAttributionID(OnGetAttributtionID);
+            //     }
+                
+            // }
+        }
+        
+        private CCMMP initCurrentMMP()
+        {
+            
+            string[] adapterNameArray = { "CostCenter.Attribution.CCAdjustAdapter",
+                                          "CostCenter.Attribution.CCAppsflyerAdapter",
+                                          "CostCenter.Attribution.CCMMP"};
+            
+
+            System.Type GetType(string typeName)
+            {
+                var type = System.Type.GetType(typeName);
+                if (type != null) return type;
+
+                foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    // Debug.Log("FullName:" + a.GetName());
+                    // if(a.FullName == "LihuhuGameEvent")
+                    {
+                        type = a.GetType(typeName);
+                        if (type != null)
+                        {
+                            // Debug.Log("FullName 0:" + a.GetName());
+                            return type;
+                        }
+
+                    }
+
+                }
+                return null;
+            }
+
+            foreach (string adapterName in adapterNameArray)
+            {
+                // Debug.Log(" CCAttribution InitWithAdapter 0 " + adapterName);
+                System.Type adapterType = GetType(adapterName);
+                if (adapterType == null)
+                {
+                    continue;
+                }
+
+                // Debug.Log(" CCAttribution InitWithAdapter 2 ");
+                var finalAdapter = this.gameObject.AddComponent(adapterType) as CCMMP;
+                // Debug.Log(" CCAttribution InitWithAdapter 3 ");
+                if (finalAdapter == null)
+                {
+                    continue;
+                }
+
+                Debug.Log("CCSDK - CCAttribution InitWithAdapter init successfully with " + adapterName);
+                return finalAdapter;
+            }
+
+            return null;
         }
 
         public void TrackingAttribution(string firebaseAppInstanceId) {
@@ -26,8 +94,18 @@ namespace CostCenter.Attribution
                 StartCoroutine(CCTracking.AppOpen(
                     firebaseAppInstanceId: firebaseAppInstanceId
                 ));
+                
                 CCTracking.IsFirstOpen = false;
             }
+            
+            if (!CCTracking.IsTrackedMMP) {
+                var adapter = initCurrentMMP();
+                if (adapter != null)
+                {
+                    adapter.CheckAndGetAttributionID((string attributionId) => OnGetAttributtionId(attributionId, firebaseAppInstanceId));
+                }
+            }
+            
             #if UNITY_IOS && !UNITY_EDITOR
             if (!CCTracking.IsTrackedATT) {
                 StartCoroutine(CCTracking.TrackATT(
@@ -36,6 +114,16 @@ namespace CostCenter.Attribution
                 ));
             }
             #endif
+        }
+
+        private void OnGetAttributtionId(string attributionId, string firebaseAppInstanceId) {
+            if (string.IsNullOrEmpty(attributionId)) {
+                return;
+            }
+            StartCoroutine(CCTracking.TrackMMP(
+                attributionId: attributionId,
+                firebaseAppInstanceId: firebaseAppInstanceId
+            ));
         }
 
         #if UNITY_IOS && !UNITY_EDITOR
