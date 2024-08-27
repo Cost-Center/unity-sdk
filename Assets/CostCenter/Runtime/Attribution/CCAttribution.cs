@@ -37,9 +37,12 @@ namespace CostCenter.Attribution
         private CCMMP initCurrentMMP()
         {
             
-            string[] adapterNameArray = { "CostCenter.Attribution.CCAdjustAdapter",
-                                          "CostCenter.Attribution.CCAppsflyerAdapter",
-                                          "CostCenter.Attribution.CCMMP"};
+            string[] adapterNameArray = {
+                "CostCenter.Attribution.CCAdjustAdapter",
+                "CostCenter.Attribution.CCAppsflyerAdapter",
+                "CostCenter.Attribution.CCSingularAdapter",
+                "CostCenter.Attribution.CCMMP"
+            };
             
 
             System.Type GetType(string typeName)

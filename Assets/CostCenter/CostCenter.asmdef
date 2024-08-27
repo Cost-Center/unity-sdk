@@ -1,10 +1,7 @@
 {
     "name": "ExtraLabs.CostCenter",
     "rootNamespace": "",
-    "references": [
-        "AdjustSdk.Scripts",
-        "AppsFlyer"
-    ],
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
