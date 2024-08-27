@@ -10,11 +10,7 @@ namespace CostCenter.Attribution
         public override void CheckAndGetAttributionID(Action<string> callback)
         {
             base.CheckAndGetAttributionID(callback);
-            #if UNITY_ANDROID && !UNITY_EDITOR
             StartCoroutine(C_WaitForAttributionID());
-            #else
-            onGetAttributionID?.Invoke(_attributionID);
-            #endif
         }
         private IEnumerator C_WaitForAttributionID()
         {
@@ -25,7 +21,7 @@ namespace CostCenter.Attribution
             
             while (string.IsNullOrEmpty(_attributionID) == true && waitingTimes.Count > 0)
             {
-                _attributionID = AppsFlyer.getAttributionId();
+                _attributionID = AppsFlyer.getAppsFlyerId();
                 
                    
                 SetAttributionIDToThirdParty(_attributionID);
