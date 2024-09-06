@@ -1,7 +1,7 @@
 # Cost Center SDK Change Log
 
 ## v1.2.0
-- MMP: Support Adjust v5.x + Appsflyer v6.15
+- MMP: Support Adjust v5.x + Appsflyer v6.15 + Singular v5.2
 
 ## v1.1.1
 - Update tracking logic
