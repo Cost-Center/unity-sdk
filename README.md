@@ -17,7 +17,7 @@ Find the manifest.json file in the Packages folder of your project and edit it t
         },
     }
 To update the package, change suffix  `#{version}`  to the target version.
--   e.g.  `"https://github.com/Cost-Center/unity-sdk.git?path=/Assets/CostCenter#v1.1.0"`
+-   e.g.  `"https://github.com/Cost-Center/unity-sdk.git?path=/Assets/CostCenter#v1.2.0"`
 
 #### For Unity 2018.2 or earlier
 1.  Download a source code zip file from  [Releases](https://github.com/Cost-Center/unity-sdk/releases)  page
@@ -28,6 +28,7 @@ To update the package, change suffix  `#{version}`  to the target version.
  - Select `GameObject/Cost Center/Create Manager`  from Unity menu
  - A new manager game object will be added to current `Scene`
  - Select new game object, click `Add Attribution` in CCServices
+ - MMP: Import `Adapters/cc_adapter_<attribution>_v<x.y.z>.unitypackage` to your Unity project
 
 ## License
 -   ExtraLabs
