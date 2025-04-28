@@ -11,28 +11,28 @@ using Ugi.PlayInstallReferrerPlugin;
 namespace CostCenter.Attribution {
     public class CCTracking
     {
-        private const int MAXIMUM_RETRY = 5;
-        internal static bool IsFirstOpen {
-            get {
-                if (PlayerPrefs.HasKey(CCConstant.FIRST_OPEN_KEY)) {
-                    int isFirst = PlayerPrefs.GetInt(CCConstant.FIRST_OPEN_KEY);
-                    return isFirst <= 0 && isFirst > -MAXIMUM_RETRY;
-                }
-                return true;
-            }
-            set {
-                if (!value) {
-                    PlayerPrefs.SetInt(CCConstant.FIRST_OPEN_KEY, 1);
-                    return;
-                }
-                if (!PlayerPrefs.HasKey(CCConstant.FIRST_OPEN_KEY)) {
-                    PlayerPrefs.SetInt(CCConstant.FIRST_OPEN_KEY, 0);
-                    return;
-                }
-                int lastFirst = PlayerPrefs.GetInt(CCConstant.FIRST_OPEN_KEY);
-                PlayerPrefs.SetInt(CCConstant.FIRST_OPEN_KEY, lastFirst - 1);
-            }
-        }
+        // private const int MAXIMUM_RETRY = 5;
+        // internal static bool IsFirstOpen {
+        //     get {
+        //         if (PlayerPrefs.HasKey(CCConstant.FIRST_OPEN_KEY)) {
+        //             int isFirst = PlayerPrefs.GetInt(CCConstant.FIRST_OPEN_KEY);
+        //             return isFirst <= 0 && isFirst > -MAXIMUM_RETRY;
+        //         }
+        //         return true;
+        //     }
+        //     set {
+        //         if (!value) {
+        //             PlayerPrefs.SetInt(CCConstant.FIRST_OPEN_KEY, 1);
+        //             return;
+        //         }
+        //         if (!PlayerPrefs.HasKey(CCConstant.FIRST_OPEN_KEY)) {
+        //             PlayerPrefs.SetInt(CCConstant.FIRST_OPEN_KEY, 0);
+        //             return;
+        //         }
+        //         int lastFirst = PlayerPrefs.GetInt(CCConstant.FIRST_OPEN_KEY);
+        //         PlayerPrefs.SetInt(CCConstant.FIRST_OPEN_KEY, lastFirst - 1);
+        //     }
+        // }
         internal static bool IsTrackedATT {
             get {
                 return PlayerPrefs.GetInt(CCConstant.TRACKED_ATT_KEY, 0) == 1;

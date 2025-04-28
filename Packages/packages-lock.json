@@ -15,25 +15,33 @@
       "hash": "a7528f32be5b5b83c707e40952893adb0707b6cd"
     },
     "com.google.external-dependency-manager": {
-      "version": "file:../../firebase-sdk-unity/9.1.0/com.google.external-dependency-manager-1.2.171.tgz",
+      "version": "file:../../firebase-sdk-unity/11.9.0/com.google.external-dependency-manager-1.2.177.tgz",
       "depth": 0,
       "source": "local-tarball",
       "dependencies": {}
     },
     "com.google.firebase.analytics": {
-      "version": "file:../../firebase-sdk-unity/9.1.0/com.google.firebase.analytics-9.1.0.tgz",
+      "version": "file:../../firebase-sdk-unity/11.9.0/com.google.firebase.analytics-11.9.0.tgz",
       "depth": 0,
       "source": "local-tarball",
       "dependencies": {
-        "com.google.firebase.app": "9.1.0"
+        "com.google.firebase.app": "11.9.0"
       }
     },
     "com.google.firebase.app": {
-      "version": "file:../../firebase-sdk-unity/9.1.0/com.google.firebase.app-9.1.0.tgz",
+      "version": "file:../../firebase-sdk-unity/11.9.0/com.google.firebase.app-11.9.0.tgz",
       "depth": 0,
       "source": "local-tarball",
       "dependencies": {
-        "com.google.external-dependency-manager": "1.2.171"
+        "com.google.external-dependency-manager": "1.2.177"
+      }
+    },
+    "com.google.firebase.remote-config": {
+      "version": "file:../../firebase-sdk-unity/11.9.0/com.google.firebase.remote-config-11.9.0.tgz",
+      "depth": 0,
+      "source": "local-tarball",
+      "dependencies": {
+        "com.google.firebase.app": "11.9.0"
       }
     },
     "com.unity.2d.animation": {
@@ -53,10 +61,10 @@
       "depth": 2,
       "source": "registry",
       "dependencies": {
+        "com.unity.burst": "1.5.1",
         "com.unity.2d.sprite": "1.0.0",
         "com.unity.mathematics": "1.1.0",
-        "com.unity.modules.uielements": "1.0.0",
-        "com.unity.burst": "1.5.1"
+        "com.unity.modules.uielements": "1.0.0"
       },
       "url": "https://packages.unity.com"
     },
@@ -79,9 +87,9 @@
       "depth": 1,
       "source": "registry",
       "dependencies": {
-        "com.unity.2d.animation": "7.0.9",
         "com.unity.2d.common": "6.0.6",
-        "com.unity.2d.sprite": "1.0.0"
+        "com.unity.2d.sprite": "1.0.0",
+        "com.unity.2d.animation": "7.0.9"
       },
       "url": "https://packages.unity.com"
     },
@@ -96,9 +104,9 @@
       "depth": 1,
       "source": "registry",
       "dependencies": {
-        "com.unity.mathematics": "1.1.0",
-        "com.unity.2d.common": "6.0.6",
         "com.unity.2d.path": "5.0.2",
+        "com.unity.2d.common": "6.0.6",
+        "com.unity.mathematics": "1.1.0",
         "com.unity.modules.physics2d": "1.0.0"
       },
       "url": "https://packages.unity.com"
@@ -203,11 +211,11 @@
       "source": "registry",
       "dependencies": {
         "com.unity.ugui": "1.0.0",
-        "com.unity.modules.unityanalytics": "1.0.0",
-        "com.unity.modules.unitywebrequest": "1.0.0",
-        "com.unity.modules.jsonserialize": "1.0.0",
+        "com.unity.services.core": "1.8.1",
         "com.unity.modules.androidjni": "1.0.0",
-        "com.unity.services.core": "1.8.1"
+        "com.unity.modules.jsonserialize": "1.0.0",
+        "com.unity.modules.unityanalytics": "1.0.0",
+        "com.unity.modules.unitywebrequest": "1.0.0"
       },
       "url": "https://packages.unity.com"
     },
@@ -216,9 +224,9 @@
       "depth": 2,
       "source": "registry",
       "dependencies": {
-        "com.unity.modules.unitywebrequest": "1.0.0",
+        "com.unity.modules.androidjni": "1.0.0",
         "com.unity.nuget.newtonsoft-json": "3.2.1",
-        "com.unity.modules.androidjni": "1.0.0"
+        "com.unity.modules.unitywebrequest": "1.0.0"
       },
       "url": "https://packages.unity.com"
     },
@@ -247,9 +255,9 @@
       "depth": 0,
       "source": "registry",
       "dependencies": {
+        "com.unity.modules.audio": "1.0.0",
         "com.unity.modules.director": "1.0.0",
         "com.unity.modules.animation": "1.0.0",
-        "com.unity.modules.audio": "1.0.0",
         "com.unity.modules.particlesystem": "1.0.0"
       },
       "url": "https://packages.unity.com"

@@ -93,12 +93,10 @@ namespace CostCenter.Attribution
         }
 
         public void TrackingAttribution(string firebaseAppInstanceId) {
-            if (CCTracking.IsFirstOpen) {
+            if (CCConstant.IsFirstOpen) {
                 StartCoroutine(CCTracking.AppOpen(
                     firebaseAppInstanceId: firebaseAppInstanceId
                 ));
-                
-                CCTracking.IsFirstOpen = false;
             }
             
             if (!CCTracking.IsTrackedMMP) {

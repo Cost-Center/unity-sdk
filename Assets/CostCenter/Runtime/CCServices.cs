@@ -1,5 +1,6 @@
 using UnityEngine;
 using CostCenter.Attribution;
+using CostCenter.RemoteConfig;
 
 namespace CostCenter {
     public class CCServices : MonoBehaviour
@@ -19,6 +20,15 @@ namespace CostCenter {
                 return;
             }
             gameObject.AddComponent<CCAttribution>();
+        }
+
+        public void AddRemoteConfig()
+        {
+            if (gameObject.GetComponent<CCRemoteConfig>()) {
+                Debug.LogError("CCRemoteConfig has already added.");
+                return;
+            }
+            gameObject.AddComponent<CCRemoteConfig>();
         }
     }
 }

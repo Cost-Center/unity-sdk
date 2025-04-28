@@ -16,6 +16,11 @@ namespace CostCenter.Editor {
                 manager.AddAttribution();
                 EditorUtility.SetDirty(manager);
             }
+
+            if (GUILayout.Button("Add Remote Config")) {
+                manager.AddRemoteConfig();
+                EditorUtility.SetDirty(manager);
+            }
         }
     }
 }

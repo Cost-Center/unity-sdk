@@ -2,9 +2,10 @@
   "dependencies": {
     "appsflyer-unity-plugin": "https://github.com/AppsFlyerSDK/appsflyer-unity-plugin.git#v6.15.1",
     "com.adjust.sdk": "https://github.com/adjust/unity_sdk.git?path=/Assets/Adjust#v5.0.1",
-    "com.google.external-dependency-manager": "file:../../firebase-sdk-unity/9.1.0/com.google.external-dependency-manager-1.2.171.tgz",
-    "com.google.firebase.analytics": "file:../../firebase-sdk-unity/9.1.0/com.google.firebase.analytics-9.1.0.tgz",
-    "com.google.firebase.app": "file:../../firebase-sdk-unity/9.1.0/com.google.firebase.app-9.1.0.tgz",
+    "com.google.external-dependency-manager": "file:../../firebase-sdk-unity/11.9.0/com.google.external-dependency-manager-1.2.177.tgz",
+    "com.google.firebase.analytics": "file:../../firebase-sdk-unity/11.9.0/com.google.firebase.analytics-11.9.0.tgz",
+    "com.google.firebase.app": "file:../../firebase-sdk-unity/11.9.0/com.google.firebase.app-11.9.0.tgz",
+    "com.google.firebase.remote-config": "file:../../firebase-sdk-unity/11.9.0/com.google.firebase.remote-config-11.9.0.tgz",
     "com.unity.collab-proxy": "2.0.4",
     "com.unity.feature.2d": "1.0.0",
     "com.unity.ide.rider": "3.0.21",
