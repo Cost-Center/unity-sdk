@@ -1,5 +1,8 @@
 # Cost Center SDK Change Log
 
+## v1.3.0
+- Add RemoteConfig service
+
 ## v1.2.0
 - MMP: Support Adjust v5.x + Appsflyer v6.15 + Singular v5.2
 
