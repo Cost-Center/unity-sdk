@@ -26,8 +26,9 @@ To update the package, change suffix  `#{version}`  to the target version.
 
 ## How to use
  - Select `GameObject/Cost Center/Create Manager`  from Unity menu
- - A new manager game object will be added to current `Scene`
- - Select new game object, click `Add Attribution` in CCServices
+ - A new manager game object will be added to current `Scene`.
+ - **Important**: there should be only one game object for Cost Center for all scences. If a project has multiple scenes, you can create this game object once only at the loading scene, then tick "Don't Destroy"
+ - Select the new game object, click `Add Attribution` in CCServices
  - MMP: Import `Adapters/cc_adapter_<attribution>_v<x.y.z>.unitypackage` to your Unity project
 
 ## License
