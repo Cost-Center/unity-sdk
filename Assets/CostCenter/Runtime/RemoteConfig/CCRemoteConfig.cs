@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Firebase.RemoteConfig;
+using Newtonsoft.Json;
 
 namespace CostCenter.RemoteConfig {
     public class CCRemoteConfig : MonoBehaviour
@@ -121,7 +122,7 @@ namespace CostCenter.RemoteConfig {
             if (string.IsNullOrEmpty(stringValue)) {
                 return null;
             }
-            CCConversionConfig[] configures = JsonUtility.FromJson<CCConversionConfig[]>(stringValue);
+            CCConversionConfig[] configures = JsonConvert.DeserializeObject<CCConversionConfig[]>(stringValue);
             if (configures == null || configures.Length <= 0) {
                 return null;
             }
