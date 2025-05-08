@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,7 +17,7 @@ namespace CostCenter.RemoteConfig {
             protected set;
         }
 
-        [SerializeField] private string[] _conversionFields = new string[] {
+        protected static readonly string[] DEFAULT_CONVERSION_FIELDS = new string[] {
             "media_source",
             "install_time",
             "af_siteid",
@@ -26,12 +27,17 @@ namespace CostCenter.RemoteConfig {
             "campaign_id",
             "campaign"
         };
+        [SerializeField] private string[] _conversionFields = DEFAULT_CONVERSION_FIELDS;
 
         public static Action<bool> OnFetchRemoteConfig;
 
         void Awake() {
             instance = this;
             ConversionData = new Dictionary<string, object>();
+        }
+
+        public void ResetDefaultValues() {
+            _conversionFields = DEFAULT_CONVERSION_FIELDS;
         }
 
         public void OnConversionDataSuccess(Dictionary<string, object> conversionData)
@@ -53,27 +59,32 @@ namespace CostCenter.RemoteConfig {
             // Loop qua các cặp data có trong conversion data để set user property
             foreach (var pair in conversionData)
             {
-                switch (pair.Key)
-                {
-                    // Các key cần set có thể tự custom lại (thêm hoặc bớt)
-                    case "media_source":
-                    case "install_time":
-                    case "af_siteid":
-                    case "adgroup_id":
-                    case "adset":
-                    case "adset_id":
-                    case "campaign_id":
-                    case "campaign":  // <- Đây là key mình cần và đã set ở trên dashboard Firebase
-                        var value = string.Empty;
-                        if (pair.Value != null)
-                        {
-                            value = pair.Value.ToString();
-                        }
-                        // Debug.Log("conversion data check " + pair.Key + " " + value);
-                        // _conversionDataDictionary.TryAdd(pair.Key, value);
-                        // Set user property lên firebase
-                        Firebase.Analytics.FirebaseAnalytics.SetUserProperty(pair.Key, value);
-                        break;
+                // switch (pair.Key)
+                // {
+                //     // Các key cần set có thể tự custom lại (thêm hoặc bớt)
+                //     case "media_source":
+                //     case "install_time":
+                //     case "af_siteid":
+                //     case "adgroup_id":
+                //     case "adset":
+                //     case "adset_id":
+                //     case "campaign_id":
+                //     case "campaign":
+                //         var value = string.Empty;
+                //         if (pair.Value != null)
+                //         {
+                //             value = pair.Value.ToString();
+                //         }
+                //         Firebase.Analytics.FirebaseAnalytics.SetUserProperty(pair.Key, value);
+                //         break;
+                // }
+                if (_conversionFields.Contains(pair.Key)) {
+                    var value = string.Empty;
+                    if (pair.Value != null)
+                    {
+                        value = pair.Value.ToString();
+                    }
+                    Firebase.Analytics.FirebaseAnalytics.SetUserProperty(pair.Key, value);
                 }
             }
 
@@ -84,9 +95,8 @@ namespace CostCenter.RemoteConfig {
 
         private IEnumerator IFetchRemoteConfig() 
         {
-            // Đợi firebase khởi tạo thành công
             yield return new WaitUntil(() => CCFirebase.IsInitialized);
-            // Gọi fetch remote config
+            
             var taskConfig = FirebaseRemoteConfig.DefaultInstance.SetConfigSettingsAsync(new ConfigSettings()
             {
                 MinimumFetchInternalInMilliseconds = 0,
@@ -95,14 +105,7 @@ namespace CostCenter.RemoteConfig {
             yield return new WaitUntil(() => taskConfig.IsCompleted);
             var taskFetchAndActive = FirebaseRemoteConfig.DefaultInstance.FetchAndActivateAsync();
             yield return new WaitUntil(() => taskFetchAndActive.IsCompleted);
-            // if (FirebaseRemoteConfig.DefaultInstance.Info.LastFetchStatus == LastFetchStatus.Success)
-            // {
-            //     // Fetch thành công
-            // }
-            // else
-            // {
-            //     // Fetch thất bại
-            // }
+            
             OnFetchRemoteConfig?.Invoke(FirebaseRemoteConfig.DefaultInstance.Info.LastFetchStatus == LastFetchStatus.Success);
         }
 
@@ -150,28 +153,28 @@ namespace CostCenter.RemoteConfig {
         public string GetStringValue(string key) {
             string stringValue = FirebaseRemoteConfig.DefaultInstance.GetValue(key).StringValue;
             object valueByConversion = GetDataByConversion(key);
-            Debug.Log($"GetStringValue - Conversion: {valueByConversion} - Value: {stringValue}");
+            // Debug.Log($"GetStringValue - Conversion: {valueByConversion} - Value: {stringValue}");
             return valueByConversion != null ? valueByConversion.ToString() : stringValue;
         }
 
         public bool GetBooleanValue(string key) {
             bool booleanValue = FirebaseRemoteConfig.DefaultInstance.GetValue(key).BooleanValue;
             object valueByConversion = GetDataByConversion(key);
-            Debug.Log($"GetBooleanValue - Conversion: {valueByConversion} - Value: {booleanValue}");
+            // Debug.Log($"GetBooleanValue - Conversion: {valueByConversion} - Value: {booleanValue}");
             return valueByConversion != null ? (bool)valueByConversion : booleanValue;
         }
 
         public long GetLongValue(string key) {
             long longValue = FirebaseRemoteConfig.DefaultInstance.GetValue(key).LongValue;
             object valueByConversion = GetDataByConversion(key);
-            Debug.Log($"GetLongValue - Conversion: {valueByConversion} - Value: {longValue}");
+            // Debug.Log($"GetLongValue - Conversion: {valueByConversion} - Value: {longValue}");
             return valueByConversion != null ? (long)valueByConversion : longValue;
         }
 
         public double GetDoubleValue(string key) {
             double doubleValue = FirebaseRemoteConfig.DefaultInstance.GetValue(key).DoubleValue;
             object valueByConversion = GetDataByConversion(key);
-            Debug.Log($"GetDoubleValue - Conversion: {valueByConversion} - Value: {doubleValue}");
+            // Debug.Log($"GetDoubleValue - Conversion: {valueByConversion} - Value: {doubleValue}");
             return valueByConversion != null ? (double)valueByConversion : doubleValue;
         }
     }
