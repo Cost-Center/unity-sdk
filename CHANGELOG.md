@@ -1,5 +1,8 @@
 # Cost Center SDK Change Log
 
+## v1.3.1
+- RemoteConfig: fix bug MinimumFetchIntervalInMilliseconds
+
 ## v1.3.0
 - Add RemoteConfig service
 

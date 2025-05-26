@@ -99,7 +99,7 @@ namespace CostCenter.RemoteConfig {
             
             var taskConfig = FirebaseRemoteConfig.DefaultInstance.SetConfigSettingsAsync(new ConfigSettings()
             {
-                MinimumFetchInternalInMilliseconds = 0,
+                MinimumFetchIntervalInMilliseconds = 0,
                 FetchTimeoutInMilliseconds = 3000
             });
             yield return new WaitUntil(() => taskConfig.IsCompleted);
