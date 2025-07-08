@@ -1,7 +1,8 @@
 # Cost Center SDK Change Log
 
 ## v1.3.2
-- RemoteConfig: Fix bug + Add group logic on campaign<>campaign_id & adset<>adset_id
+- RemoteConfig condition: Fix bug + Add group logic on campaign<>campaign_id & adset<>adset_id
+- RemoteConfig fetch: Add option on/off re-fetch remote config for A/B test
 
 ## v1.3.1
 - RemoteConfig: fix bug MinimumFetchIntervalInMilliseconds
