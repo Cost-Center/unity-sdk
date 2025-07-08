@@ -28,6 +28,8 @@ namespace CostCenter.RemoteConfig {
             "campaign"
         };
         [SerializeField] private string[] _conversionFields = DEFAULT_CONVERSION_FIELDS;
+        [Tooltip("Support for A/B Testing (only on first open)")]
+        [SerializeField] private bool _autoReFetchRemoteConfig = false;
 
         public static Action<bool> OnFetchRemoteConfig;
 
@@ -56,29 +58,16 @@ namespace CostCenter.RemoteConfig {
 
             ConversionData = conversionData;
 
+            if (!CCFirebase.IsInitialized)
+            {
+                return;
+            }
+
             // Loop qua các cặp data có trong conversion data để set user property
             foreach (var pair in conversionData)
             {
-                // switch (pair.Key)
-                // {
-                //     // Các key cần set có thể tự custom lại (thêm hoặc bớt)
-                //     case "media_source":
-                //     case "install_time":
-                //     case "af_siteid":
-                //     case "adgroup_id":
-                //     case "adset":
-                //     case "adset_id":
-                //     case "campaign_id":
-                //     case "campaign":
-                //         var value = string.Empty;
-                //         if (pair.Value != null)
-                //         {
-                //             value = pair.Value.ToString();
-                //         }
-                //         Firebase.Analytics.FirebaseAnalytics.SetUserProperty(pair.Key, value);
-                //         break;
-                // }
-                if (_conversionFields.Contains(pair.Key)) {
+                if (_conversionFields.Contains(pair.Key))
+                {
                     var value = string.Empty;
                     if (pair.Value != null)
                     {
@@ -88,7 +77,7 @@ namespace CostCenter.RemoteConfig {
                 }
             }
 
-            if (CCConstant.IsFirstOpen) {
+            if (_autoReFetchRemoteConfig && CCConstant.IsFirstOpen) {
                 FetchRemoteConfig();
             }
         }
@@ -115,35 +104,24 @@ namespace CostCenter.RemoteConfig {
         }
 
         public object GetDataByConversion(string key) {
-            if (
-                ConversionData == null
-                || ConversionData.Count <= 0
-            ) {
+            if (ConversionData == null || ConversionData.Count <= 0) {
                 return null;
             }
+
             string stringValue = FirebaseRemoteConfig.DefaultInstance.GetValue($"cc__{key}").StringValue;
             if (string.IsNullOrEmpty(stringValue)) {
                 return null;
             }
+
             CCConversionConfig[] configures = JsonConvert.DeserializeObject<CCConversionConfig[]>(stringValue);
             if (configures == null || configures.Length <= 0) {
                 return null;
             }
-            foreach (var config in configures) {
-                bool isCompare = true;
-                foreach (var field in _conversionFields) {
-                    if (
-                        ConversionData.ContainsKey(field)
-                        && ConversionData[field] != null
-                        && config.CompareValue(field, ConversionData[field])
-                    ) {
-                        continue;
-                    }
-                    isCompare = false;
-                    break;
-                }
-
-                if (isCompare) {
+            
+            foreach (var config in configures)
+            {
+                if (config.IsMapWithConversionData(ConversionData))
+                {
                     return config.value;
                 }
             }

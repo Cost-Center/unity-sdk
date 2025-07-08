@@ -1,5 +1,8 @@
 # Cost Center SDK Change Log
 
+## v1.3.2
+- RemoteConfig: Fix bug + Add group logic on campaign<>campaign_id & adset<>adset_id
+
 ## v1.3.1
 - RemoteConfig: fix bug MinimumFetchIntervalInMilliseconds
 
