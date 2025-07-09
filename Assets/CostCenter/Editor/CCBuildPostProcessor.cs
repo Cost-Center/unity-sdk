@@ -1,8 +1,10 @@
 using System.IO;
 using UnityEngine;
+#if UNITY_IOS && !UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEditor.iOS.Xcode;
+#endif
 
 namespace CostCenter.Editor {
     public class CCBuildPostProcessor
