@@ -4,7 +4,7 @@
 // #import <AdSupport/AdSupport.h>
 
 
-char* MakeStringCopy (const char* string)
+char* CCMakeStringCopy (const char* string)
 {
     if (string == NULL)
         return NULL;
@@ -21,7 +21,7 @@ extern "C" {
         if (@available(iOS 14.3, *)) {
             NSError *error;
             NSString *attributionToken = [AAAttribution attributionTokenWithError:&error];
-            return MakeStringCopy([attributionToken UTF8String]);
+            return CCMakeStringCopy([attributionToken UTF8String]);
         }
         return NULL;
 	}
@@ -30,7 +30,7 @@ extern "C" {
 	{
         if (@available(iOS 14, *)) {
             NSString *idfaString = [[[ASIdentifierManager sharedManager] advertisingIdentifier] UUIDString];
-            return MakeStringCopy([idfaString UTF8String]);
+            return CCMakeStringCopy([idfaString UTF8String]);
         }
         return NULL;
 	}
