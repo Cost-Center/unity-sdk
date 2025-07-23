@@ -60,10 +60,32 @@ namespace CostCenter.Attribution {
 
         internal static IEnumerator AppOpen(string firebaseAppInstanceId = null, float delayTime = 1.0f)
         {
+            yield return new WaitUntil(() => CCFirebase.IsInitialized);
+
             yield return new WaitForSeconds(delayTime);
+            // _firebaseAppInstanceId = string.IsNullOrEmpty(firebaseAppInstanceId) ? _firebaseAppInstanceId : firebaseAppInstanceId;
+            // if (string.IsNullOrEmpty(_firebaseAppInstanceId)) {
+            //     System.Threading.Tasks.Task<string> task = Firebase.Analytics.FirebaseAnalytics.GetAnalyticsInstanceIdAsync();
+            //     yield return new WaitUntil(() => task.IsCompleted);
+            //     _firebaseAppInstanceId = task.Result;
+            // }
+            System.Threading.Tasks.Task<string> task = null;
             _firebaseAppInstanceId = string.IsNullOrEmpty(firebaseAppInstanceId) ? _firebaseAppInstanceId : firebaseAppInstanceId;
-            if (string.IsNullOrEmpty(_firebaseAppInstanceId)) {
-                System.Threading.Tasks.Task<string> task = Firebase.Analytics.FirebaseAnalytics.GetAnalyticsInstanceIdAsync();
+            try
+            {
+                if (string.IsNullOrEmpty(_firebaseAppInstanceId))
+                {
+                    task = Firebase.Analytics.FirebaseAnalytics.GetAnalyticsInstanceIdAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"CC Tracking AppOpen: Failed to set user property 'attribution_id'. {ex.Message}");
+                yield break;
+            }
+
+            if (task != null)
+            {
                 yield return new WaitUntil(() => task.IsCompleted);
                 _firebaseAppInstanceId = task.Result;
             }
@@ -178,6 +200,8 @@ namespace CostCenter.Attribution {
 
         internal static IEnumerator TrackATT(string firebaseAppInstanceId = null, float delayTime = 2.0f)
         {
+            yield return new WaitUntil(() => CCFirebase.IsInitialized);
+            
             yield return new WaitForSeconds(delayTime);
 
             string idfa = GetIDFA();
@@ -186,11 +210,31 @@ namespace CostCenter.Attribution {
                 yield break;
             }
 
-            string fbAppInstanceId = firebaseAppInstanceId;
-            if (string.IsNullOrEmpty(fbAppInstanceId)) {
-                System.Threading.Tasks.Task<string> task = Firebase.Analytics.FirebaseAnalytics.GetAnalyticsInstanceIdAsync();
+            // string fbAppInstanceId = firebaseAppInstanceId;
+            // if (string.IsNullOrEmpty(fbAppInstanceId)) {
+            //     System.Threading.Tasks.Task<string> task = Firebase.Analytics.FirebaseAnalytics.GetAnalyticsInstanceIdAsync();
+            //     yield return new WaitUntil(() => task.IsCompleted);
+            //     fbAppInstanceId = task.Result;
+            // }
+            System.Threading.Tasks.Task<string> task = null;
+            _firebaseAppInstanceId = string.IsNullOrEmpty(firebaseAppInstanceId) ? _firebaseAppInstanceId : firebaseAppInstanceId;
+            try
+            {
+                if (string.IsNullOrEmpty(_firebaseAppInstanceId))
+                {
+                    task = Firebase.Analytics.FirebaseAnalytics.GetAnalyticsInstanceIdAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"CC Tracking ATT: Failed to set user property 'attribution_id'. {ex.Message}");
+                yield break;
+            }
+
+            if (task != null)
+            {
                 yield return new WaitUntil(() => task.IsCompleted);
-                fbAppInstanceId = task.Result;
+                _firebaseAppInstanceId = task.Result;
             }
 
             string bundleId = Application.identifier;
@@ -199,8 +243,8 @@ namespace CostCenter.Attribution {
             string url = "https://attribution.costcenter.net/appopen?";
             url += $"bundle_id={bundleId}";
             url += $"&platform={platform}";
-            if (!string.IsNullOrEmpty(fbAppInstanceId)) {
-                url += $"&firebase_app_instance_id={fbAppInstanceId}";
+            if (!string.IsNullOrEmpty(_firebaseAppInstanceId)) {
+                url += $"&firebase_app_instance_id={_firebaseAppInstanceId}";
             }
             url += $"&vendor_id={UnityWebRequest.EscapeURL(GetIDFV())}";
             url += $"&advertising_id={UnityWebRequest.EscapeURL(idfa)}";
@@ -270,11 +314,26 @@ namespace CostCenter.Attribution {
 
         internal static IEnumerator TrackMMP(string attributionId, string firebaseAppInstanceId = null)
         {
-            Firebase.Analytics.FirebaseAnalytics.SetUserProperty("attribution_id", attributionId);
+            yield return new WaitUntil(() => CCFirebase.IsInitialized);
 
-            _firebaseAppInstanceId = string.IsNullOrEmpty(firebaseAppInstanceId) ? _firebaseAppInstanceId : firebaseAppInstanceId;
-            if (string.IsNullOrEmpty(_firebaseAppInstanceId)) {
-                System.Threading.Tasks.Task<string> task = Firebase.Analytics.FirebaseAnalytics.GetAnalyticsInstanceIdAsync();
+            System.Threading.Tasks.Task<string> task = null;
+            try
+            {
+                Firebase.Analytics.FirebaseAnalytics.SetUserProperty("attribution_id", attributionId);
+                _firebaseAppInstanceId = string.IsNullOrEmpty(firebaseAppInstanceId) ? _firebaseAppInstanceId : firebaseAppInstanceId;
+                if (string.IsNullOrEmpty(_firebaseAppInstanceId))
+                {
+                    task = Firebase.Analytics.FirebaseAnalytics.GetAnalyticsInstanceIdAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"CC Tracking MMP: Failed to set user property 'attribution_id'. {ex.Message}");
+                yield break;
+            }
+
+            if (task != null)
+            {
                 yield return new WaitUntil(() => task.IsCompleted);
                 _firebaseAppInstanceId = task.Result;
             }

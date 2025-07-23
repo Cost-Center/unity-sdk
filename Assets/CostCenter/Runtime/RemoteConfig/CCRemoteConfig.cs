@@ -113,17 +113,25 @@ namespace CostCenter.RemoteConfig {
                 return null;
             }
 
-            CCConversionConfig[] configures = JsonConvert.DeserializeObject<CCConversionConfig[]>(stringValue);
-            if (configures == null || configures.Length <= 0) {
-                return null;
-            }
-            
-            foreach (var config in configures)
+            try
             {
-                if (config.IsMapWithConversionData(ConversionData))
+                CCConversionConfig[] configures = JsonConvert.DeserializeObject<CCConversionConfig[]>(stringValue);
+                if (configures == null || configures.Length <= 0)
                 {
-                    return config.value;
+                    return null;
                 }
+
+                foreach (var config in configures)
+                {
+                    if (config.IsMapWithConversionData(ConversionData))
+                    {
+                        return config.value;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error parsing conversion config for key '{key}', value: {stringValue}: {ex.Message}");
             }
             return null;
         }

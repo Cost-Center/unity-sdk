@@ -6,7 +6,7 @@ namespace CostCenter.Attribution.Editor {
     public class CCAttributionEditor : UnityEditor.Editor
     {
         private CCAttribution _att;
-        private bool _isShowAdapters = false;
+        // private bool _isShowAdapters = false;
 
         // void OnEnable()
         // {

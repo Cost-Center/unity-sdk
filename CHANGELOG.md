@@ -1,5 +1,9 @@
 # Cost Center SDK Change Log
 
+## v1.3.4
+- RemoteConfig: catch error on parse json value
+- Attribution: catch error on track
+
 ## v1.3.3
 - Attribution: fix conflicting iOS native function names
 
