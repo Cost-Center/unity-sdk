@@ -147,21 +147,42 @@ namespace CostCenter.RemoteConfig {
             bool booleanValue = FirebaseRemoteConfig.DefaultInstance.GetValue(key).BooleanValue;
             object valueByConversion = GetDataByConversion(key);
             // Debug.Log($"GetBooleanValue - Conversion: {valueByConversion} - Value: {booleanValue}");
-            return valueByConversion != null ? (bool)valueByConversion : booleanValue;
+            if (valueByConversion != null)
+            {
+                if (bool.TryParse(valueByConversion.ToString(), out var result))
+                {
+                    return result;
+                }
+            }
+            return booleanValue;
         }
 
         public long GetLongValue(string key) {
             long longValue = FirebaseRemoteConfig.DefaultInstance.GetValue(key).LongValue;
             object valueByConversion = GetDataByConversion(key);
             // Debug.Log($"GetLongValue - Conversion: {valueByConversion} - Value: {longValue}");
-            return valueByConversion != null ? (long)valueByConversion : longValue;
+            if (valueByConversion != null)
+            {
+                if (long.TryParse(valueByConversion.ToString(), out var result))
+                {
+                    return result;
+                }
+            }
+            return longValue;
         }
 
         public double GetDoubleValue(string key) {
             double doubleValue = FirebaseRemoteConfig.DefaultInstance.GetValue(key).DoubleValue;
             object valueByConversion = GetDataByConversion(key);
             // Debug.Log($"GetDoubleValue - Conversion: {valueByConversion} - Value: {doubleValue}");
-            return valueByConversion != null ? (double)valueByConversion : doubleValue;
+            if (valueByConversion != null)
+            {
+                if (double.TryParse(valueByConversion.ToString(), out var result))
+                {
+                    return result;
+                }
+            }
+            return doubleValue;
         }
     }
 }

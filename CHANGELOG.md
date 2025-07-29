@@ -1,5 +1,8 @@
 # Cost Center SDK Change Log
 
+## v1.3.5
+- RemoteConfig: add try parse object values
+
 ## v1.3.4
 - RemoteConfig: catch error on parse json value
 - Attribution: catch error on track
