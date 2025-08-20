@@ -1,5 +1,8 @@
 # Cost Center SDK Change Log
 
+## v1.3.6
+- RemoteConfig: cache conversion data
+
 ## v1.3.5
 - RemoteConfig: add try parse object values
 

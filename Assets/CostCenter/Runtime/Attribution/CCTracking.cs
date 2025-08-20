@@ -135,7 +135,7 @@ namespace CostCenter.Attribution {
             UnityWebRequest www = UnityWebRequest.Get(url);
             yield return www.SendWebRequest();
 
-            if (www.isNetworkError || www.isHttpError) {
+            if (www.result == UnityWebRequest.Result.ConnectionError) {
                 Debug.Log(www.error);
             } else {
                 Debug.Log("CCAttribution CallAppOpen: success");
@@ -254,7 +254,7 @@ namespace CostCenter.Attribution {
             UnityWebRequest www = UnityWebRequest.Get(url);
             yield return www.SendWebRequest();
 
-            if (www.isNetworkError || www.isHttpError) {
+            if (www.result == UnityWebRequest.Result.ConnectionError) {
                 Debug.Log(www.error);
             } else {
                 Debug.Log("CC Tracking ATT: success");
@@ -358,7 +358,7 @@ namespace CostCenter.Attribution {
             UnityWebRequest www = UnityWebRequest.Get(url);
             yield return www.SendWebRequest();
 
-            if (www.isNetworkError || www.isHttpError) {
+            if (www.result == UnityWebRequest.Result.ConnectionError) {
                 Debug.Log(www.error);
             } else {
                 Debug.Log("CCAttribution CallTrackMMP: success");

@@ -35,7 +35,7 @@ namespace CostCenter.RemoteConfig {
 
         void Awake() {
             instance = this;
-            ConversionData = new Dictionary<string, object>();
+            ConversionData = CCConversionData.Load();
         }
 
         public void ResetDefaultValues() {
@@ -45,18 +45,22 @@ namespace CostCenter.RemoteConfig {
         public void OnConversionDataSuccess(Dictionary<string, object> conversionData)
         {
             // Nếu đã nhận conversion data rồi thì không nhận nữa
-            if (_isConversionDataGet) {
+            if (_isConversionDataGet)
+            {
                 return;
             }
 
             _isConversionDataGet = true;
             // Debug.Log("onConversionDataSuccess: " + conversionData);
 
-            if (conversionData == null || conversionData.Count < 1) {
+            if (conversionData == null || conversionData.Count < 1)
+            {
                 return;
             }
 
             ConversionData = conversionData;
+
+            CCConversionData.Save(conversionData);
 
             if (!CCFirebase.IsInitialized)
             {
@@ -77,7 +81,8 @@ namespace CostCenter.RemoteConfig {
                 }
             }
 
-            if (_autoReFetchRemoteConfig && CCConstant.IsFirstOpen) {
+            if (_autoReFetchRemoteConfig && CCConstant.IsFirstOpen)
+            {
                 FetchRemoteConfig();
             }
         }
