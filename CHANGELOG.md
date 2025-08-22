@@ -2,6 +2,7 @@
 
 ## v1.3.6
 - RemoteConfig: cache conversion data
+- CCTracking: try to fix TrackMMP non fatal error
 
 ## v1.3.5
 - RemoteConfig: add try parse object values
