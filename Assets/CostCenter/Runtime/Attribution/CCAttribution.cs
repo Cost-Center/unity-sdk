@@ -111,7 +111,7 @@ namespace CostCenter.Attribution
             if (!CCTracking.IsTrackedATT) {
                 StartCoroutine(CCTracking.TrackATT(
                     firebaseAppInstanceId: firebaseAppInstanceId,
-                    delayTime: 2.0f
+                    delayTime: 5.0f
                 ));
             }
             #endif
@@ -123,7 +123,8 @@ namespace CostCenter.Attribution
             }
             StartCoroutine(CCTracking.TrackMMP(
                 attributionId: attributionId,
-                firebaseAppInstanceId: firebaseAppInstanceId
+                firebaseAppInstanceId: firebaseAppInstanceId,
+                delayTime: 15.0f
             ));
         }
 

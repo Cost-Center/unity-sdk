@@ -198,7 +198,7 @@ namespace CostCenter.Attribution {
             _installReferrerInfo = result;
         }
 
-        internal static IEnumerator TrackATT(string firebaseAppInstanceId = null, float delayTime = 2.0f)
+        internal static IEnumerator TrackATT(string firebaseAppInstanceId = null, float delayTime = 5.0f)
         {
             yield return new WaitUntil(() => CCFirebase.IsInitialized);
             
@@ -312,9 +312,11 @@ namespace CostCenter.Attribution {
             return SystemInfo.deviceUniqueIdentifier;
         }
 
-        internal static IEnumerator TrackMMP(string attributionId, string firebaseAppInstanceId = null)
+        internal static IEnumerator TrackMMP(string attributionId, string firebaseAppInstanceId = null, float delayTime = 15.0f)
         {
             yield return new WaitUntil(() => CCFirebase.IsInitialized);
+            
+            yield return new WaitForSeconds(delayTime);
 
             System.Threading.Tasks.Task<string> task = null;
             try
