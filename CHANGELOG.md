@@ -1,8 +1,8 @@
 # Cost Center SDK Change Log
 
-## v1.3.6
+## v1.4.0
 - RemoteConfig: cache conversion data
-- CCTracking: try to fix TrackMMP non fatal error
+- CCTracking: track App Set Id + try to fix TrackMMP non fatal error
 
 ## v1.3.5
 - RemoteConfig: add try parse object values

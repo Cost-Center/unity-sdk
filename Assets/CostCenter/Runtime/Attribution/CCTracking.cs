@@ -51,6 +51,7 @@ namespace CostCenter.Attribution {
         }
 
         private static Dictionary<string, object> _installReferrerInfo = null;
+        private static string _idfv = null;
         private static string _firebaseAppInstanceId = string.Empty;
 
         #if UNITY_IOS && !UNITY_EDITOR
@@ -99,7 +100,9 @@ namespace CostCenter.Attribution {
             if (!string.IsNullOrEmpty(_firebaseAppInstanceId)) {
                 url += $"&firebase_app_instance_id={_firebaseAppInstanceId}";
             }
-            url += $"&vendor_id={UnityWebRequest.EscapeURL(GetIDFV())}";
+            GetIDFV();
+            yield return new WaitUntil(() => !string.IsNullOrEmpty(_idfv));
+            url += $"&vendor_id={UnityWebRequest.EscapeURL(_idfv)}";
             #if UNITY_ANDROID && !UNITY_EDITOR
                 url += $"&advertising_id={UnityWebRequest.EscapeURL(GetIDFA())}";
             #endif
@@ -246,7 +249,7 @@ namespace CostCenter.Attribution {
             if (!string.IsNullOrEmpty(_firebaseAppInstanceId)) {
                 url += $"&firebase_app_instance_id={_firebaseAppInstanceId}";
             }
-            url += $"&vendor_id={UnityWebRequest.EscapeURL(GetIDFV())}";
+            // url += $"&vendor_id={UnityWebRequest.EscapeURL(GetIDFV())}";
             url += $"&advertising_id={UnityWebRequest.EscapeURL(idfa)}";
 
             Debug.Log($"CC Tracking ATT url: {url}");
@@ -294,28 +297,22 @@ namespace CostCenter.Attribution {
             return advertisingID;
         }
 
-        public static string GetIDFV() {
-            // #if UNITY_ANDROID && !UNITY_EDITOR
-            // try
-            // {
-            //     AndroidJavaClass up = new AndroidJavaClass ("com.unity3d.player.UnityPlayer");
-            //     AndroidJavaObject currentActivity = up.GetStatic<AndroidJavaObject> ("currentActivity");
-            //     AndroidJavaObject contentResolver = currentActivity.Call<AndroidJavaObject> ("getContentResolver");  
-            //     AndroidJavaClass secure = new AndroidJavaClass ("android.provider.Settings$Secure");
-            //     return secure.CallStatic<string> ("getString", contentResolver, "android_id");
-            // }
-            // catch (Exception e)
-            // {
-            //     Debug.Log($"CC Tracking GetIDFV Android: {e.ToString()}");
-            // }
-            // #endif
-            return SystemInfo.deviceUniqueIdentifier;
+        public static void GetIDFV() {
+            #if UNITY_ANDROID && !UNITY_EDITOR
+                AppSetIdManager.Instance.GetAppSetId((appSetId) =>
+                {
+                    _idfv = appSetId;
+                });
+            #else
+                _idfv = SystemInfo.deviceUniqueIdentifier;
+            #endif
+            
         }
 
         internal static IEnumerator TrackMMP(string attributionId, string firebaseAppInstanceId = null, float delayTime = 15.0f)
         {
             yield return new WaitUntil(() => CCFirebase.IsInitialized);
-            
+
             yield return new WaitForSeconds(delayTime);
 
             System.Threading.Tasks.Task<string> task = null;
@@ -346,13 +343,14 @@ namespace CostCenter.Attribution {
             string url = "https://attribution.costcenter.net/appopen?";
             url += $"bundle_id={bundleId}";
             url += $"&platform={platform}";
-            if (!string.IsNullOrEmpty(_firebaseAppInstanceId)) {
+            if (!string.IsNullOrEmpty(_firebaseAppInstanceId))
+            {
                 url += $"&firebase_app_instance_id={_firebaseAppInstanceId}";
             }
-            url += $"&vendor_id={UnityWebRequest.EscapeURL(GetIDFV())}";
-            #if UNITY_ANDROID && !UNITY_EDITOR
+            // url += $"&vendor_id={UnityWebRequest.EscapeURL(GetIDFV())}";
+#if UNITY_ANDROID && !UNITY_EDITOR
                 url += $"&advertising_id={UnityWebRequest.EscapeURL(GetIDFA())}";
-            #endif
+#endif
             url += $"&attribution_id={attributionId}";
 
             Debug.Log($"CC Tracking MMP: {url}");
@@ -360,9 +358,12 @@ namespace CostCenter.Attribution {
             UnityWebRequest www = UnityWebRequest.Get(url);
             yield return www.SendWebRequest();
 
-            if (www.result == UnityWebRequest.Result.ConnectionError) {
+            if (www.result == UnityWebRequest.Result.ConnectionError)
+            {
                 Debug.Log(www.error);
-            } else {
+            }
+            else
+            {
                 Debug.Log("CCAttribution CallTrackMMP: success");
                 IsTrackedMMP = true;
             }

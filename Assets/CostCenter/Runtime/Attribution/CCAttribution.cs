@@ -22,16 +22,6 @@ namespace CostCenter.Attribution
                     TrackingAttribution(null);
                 };
             }
-
-            // if (CCTracking.IsFirstOpen)
-            // {
-            //     var adapter = initCurrentMMP();
-            //     if (adapter != null)
-            //     {
-            //         adapter.CheckAndGetAttributionID(OnGetAttributtionID);
-            //     }
-                
-            // }
         }
         
         private CCMMP initCurrentMMP()
