@@ -105,6 +105,7 @@ namespace CostCenter.Attribution {
             url += $"&vendor_id={UnityWebRequest.EscapeURL(_idfv)}";
             #if UNITY_ANDROID && !UNITY_EDITOR
                 url += $"&advertising_id={UnityWebRequest.EscapeURL(GetIDFA())}";
+                Firebase.Analytics.FirebaseAnalytics.SetUserProperty("asid", _idfv);
             #endif
             
             // ANDROID INSTALL REFERRER
