@@ -1,5 +1,8 @@
 # Cost Center SDK Change Log
 
+## v1.4.1
+- CCTracking: set vendor_id to user properties
+
 ## v1.4.0
 - RemoteConfig: cache conversion data
 - CCTracking: track App Set Id + try to fix TrackMMP non fatal error
