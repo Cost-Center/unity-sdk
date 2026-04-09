@@ -312,15 +312,25 @@ namespace CostCenter.Attribution {
 
         internal static IEnumerator TrackMMP(string attributionId, string firebaseAppInstanceId = null, float delayTime = 15.0f)
         {
+            // Đợi Firebase init
             yield return new WaitUntil(() => CCFirebase.IsInitialized);
 
+            // Đợi thêm delay nếu cần
             yield return new WaitForSeconds(delayTime);
 
             System.Threading.Tasks.Task<string> task = null;
+
             try
             {
+                // 1. Set user property
                 Firebase.Analytics.FirebaseAnalytics.SetUserProperty("attribution_id", attributionId);
-                _firebaseAppInstanceId = string.IsNullOrEmpty(firebaseAppInstanceId) ? _firebaseAppInstanceId : firebaseAppInstanceId;
+
+                // 2. Set instance id in parameter
+                _firebaseAppInstanceId = string.IsNullOrEmpty(firebaseAppInstanceId)
+                    ? _firebaseAppInstanceId
+                    : firebaseAppInstanceId;
+
+                // 3. If still no instance id, call GetAnalyticsInstanceIdAsync
                 if (string.IsNullOrEmpty(_firebaseAppInstanceId))
                 {
                     task = Firebase.Analytics.FirebaseAnalytics.GetAnalyticsInstanceIdAsync();
@@ -328,45 +338,66 @@ namespace CostCenter.Attribution {
             }
             catch (Exception ex)
             {
-                Debug.LogError($"CC Tracking MMP: Failed to set user property 'attribution_id'. {ex.Message}");
+                Debug.LogError($"CC Tracking MMP: Exception when setting user property or starting GetAnalyticsInstanceIdAsync. {ex}");
                 yield break;
             }
 
+            // 4. Check task
             if (task != null)
             {
                 yield return new WaitUntil(() => task.IsCompleted);
-                _firebaseAppInstanceId = task.Result;
+
+                if (task.IsFaulted)
+                {
+                    Debug.LogError($"CC Tracking MMP: GetAnalyticsInstanceIdAsync faulted: {task.Exception}");
+                }
+                else if (task.IsCanceled)
+                {
+                    Debug.LogWarning("CC Tracking MMP: GetAnalyticsInstanceIdAsync was canceled.");
+                }
+                else
+                {
+                    _firebaseAppInstanceId = task.Result;
+                }
             }
 
+            // 5. Build URL
             string bundleId = Application.identifier;
             string platform = Application.platform == RuntimePlatform.Android ? "android" : "ios";
 
             string url = "https://attribution.costcenter.net/appopen?";
             url += $"bundle_id={bundleId}";
             url += $"&platform={platform}";
+
             if (!string.IsNullOrEmpty(_firebaseAppInstanceId))
             {
                 url += $"&firebase_app_instance_id={_firebaseAppInstanceId}";
             }
+
             // url += $"&vendor_id={UnityWebRequest.EscapeURL(GetIDFV())}";
-#if UNITY_ANDROID && !UNITY_EDITOR
-                url += $"&advertising_id={UnityWebRequest.EscapeURL(GetIDFA())}";
-#endif
+        #if UNITY_ANDROID && !UNITY_EDITOR
+            url += $"&advertising_id={UnityWebRequest.EscapeURL(GetIDFA())}";
+        #endif
+
             url += $"&attribution_id={attributionId}";
 
             Debug.Log($"CC Tracking MMP: {url}");
 
-            UnityWebRequest www = UnityWebRequest.Get(url);
-            yield return www.SendWebRequest();
+            // 6. Send request
+            using (UnityWebRequest www = UnityWebRequest.Get(url))
+            {
+                yield return www.SendWebRequest();
 
-            if (www.result == UnityWebRequest.Result.ConnectionError)
-            {
-                Debug.Log(www.error);
-            }
-            else
-            {
-                Debug.Log("CCAttribution CallTrackMMP: success");
-                IsTrackedMMP = true;
+                if (www.result == UnityWebRequest.Result.ConnectionError ||
+                    www.result == UnityWebRequest.Result.ProtocolError)
+                {
+                    Debug.LogError($"CC Tracking MMP: web request error: {www.error}");
+                }
+                else
+                {
+                    Debug.Log("CCAttribution CallTrackMMP: success");
+                    IsTrackedMMP = true;
+                }
             }
         }
     }

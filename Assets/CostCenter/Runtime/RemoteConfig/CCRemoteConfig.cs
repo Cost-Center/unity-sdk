@@ -42,6 +42,28 @@ namespace CostCenter.RemoteConfig {
             _conversionFields = DEFAULT_CONVERSION_FIELDS;
         }
 
+        private void TrackConversionDataToFirebase()
+        {
+            // Loop qua các cặp data có trong conversion data để set user property
+            foreach (var pair in ConversionData)
+            {
+                if (_conversionFields.Contains(pair.Key))
+                {
+                    var value = string.Empty;
+                    if (pair.Value != null)
+                    {
+                        value = pair.Value.ToString();
+                    }
+                    Firebase.Analytics.FirebaseAnalytics.SetUserProperty(pair.Key, value);
+                }
+            }
+
+            if (_autoReFetchRemoteConfig && CCConstant.IsFirstOpen)
+            {
+                FetchRemoteConfig();
+            }
+        }
+
         public void OnConversionDataSuccess(Dictionary<string, object> conversionData)
         {
             // Nếu đã nhận conversion data rồi thì không nhận nữa
@@ -64,26 +86,11 @@ namespace CostCenter.RemoteConfig {
 
             if (!CCFirebase.IsInitialized)
             {
-                return;
-            }
-
-            // Loop qua các cặp data có trong conversion data để set user property
-            foreach (var pair in conversionData)
-            {
-                if (_conversionFields.Contains(pair.Key))
-                {
-                    var value = string.Empty;
-                    if (pair.Value != null)
-                    {
-                        value = pair.Value.ToString();
-                    }
-                    Firebase.Analytics.FirebaseAnalytics.SetUserProperty(pair.Key, value);
-                }
-            }
-
-            if (_autoReFetchRemoteConfig && CCConstant.IsFirstOpen)
-            {
-                FetchRemoteConfig();
+                CCFirebase.OnFirebaseInitialized += () => {
+                    TrackConversionDataToFirebase();
+                };
+            } else {
+                TrackConversionDataToFirebase();
             }
         }
 

@@ -1,6 +1,9 @@
 # Cost Center SDK Change Log
 
 ## v1.4.1
+- CCRemoteConfig: support Adjust MMP
+
+## v1.4.1
 - CCTracking: set vendor_id to user properties
 
 ## v1.4.0

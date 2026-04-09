@@ -14,6 +14,19 @@ namespace CostCenter.Attribution
         public static CCAttribution instance;
 
         [SerializeField] private bool _autoTracking = true;
+
+        private CCMMP _currentMMP;
+        public CCMMP CurrentMMP
+        {
+            get
+            {
+                if (_currentMMP == null)
+                {
+                    _currentMMP = initCurrentMMP();
+                }
+                return _currentMMP;
+            }
+        }
         
         void Awake() {
             instance = this;
@@ -90,11 +103,7 @@ namespace CostCenter.Attribution
             }
             
             if (!CCTracking.IsTrackedMMP) {
-                var adapter = initCurrentMMP();
-                if (adapter != null)
-                {
-                    adapter.CheckAndGetAttributionID((string attributionId) => OnGetAttributtionId(attributionId, firebaseAppInstanceId));
-                }
+                CurrentMMP?.CheckAndGetAttributionID((string attributionId) => OnGetAttributtionId(attributionId, firebaseAppInstanceId));
             }
             
             #if UNITY_IOS && !UNITY_EDITOR
