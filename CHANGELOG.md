@@ -1,6 +1,6 @@
 # Cost Center SDK Change Log
 
-## v1.4.1
+## v1.5.0
 - CCRemoteConfig: support Adjust MMP
 
 ## v1.4.1
