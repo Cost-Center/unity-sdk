@@ -1,5 +1,8 @@
 # Cost Center SDK Change Log
 
+## v1.5.1
+- CCTracking: fix non-fatal tracking
+
 ## v1.5.0
 - CCRemoteConfig: support Adjust MMP
 

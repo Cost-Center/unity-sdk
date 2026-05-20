@@ -88,7 +88,18 @@ namespace CostCenter.Attribution {
             if (task != null)
             {
                 yield return new WaitUntil(() => task.IsCompleted);
-                _firebaseAppInstanceId = task.Result;
+                if (task.IsFaulted || task.IsCanceled)
+                {
+                    // Debug.LogError($"CC Tracking AppOpen: GetAnalyticsInstanceIdAsync faulted: {task.Exception}");
+                    yield break;
+                }
+                try
+                {
+                    _firebaseAppInstanceId = task.Result;
+                } catch (Exception)
+                {
+                    yield break;
+                }
             }
 
             string bundleId = Application.identifier;
@@ -238,7 +249,18 @@ namespace CostCenter.Attribution {
             if (task != null)
             {
                 yield return new WaitUntil(() => task.IsCompleted);
-                _firebaseAppInstanceId = task.Result;
+                if (task.IsFaulted || task.IsCanceled)
+                {
+                    // Debug.LogError($"CC Tracking ATT: GetAnalyticsInstanceIdAsync faulted: {task.Exception}");
+                    yield break;
+                }
+                try
+                {
+                    _firebaseAppInstanceId = task.Result;
+                } catch (Exception)
+                {
+                    yield break;
+                }
             }
 
             string bundleId = Application.identifier;
@@ -347,17 +369,17 @@ namespace CostCenter.Attribution {
             {
                 yield return new WaitUntil(() => task.IsCompleted);
 
-                if (task.IsFaulted)
+                if (task.IsFaulted || task.IsCanceled)
                 {
-                    Debug.LogError($"CC Tracking MMP: GetAnalyticsInstanceIdAsync faulted: {task.Exception}");
+                    // Debug.LogError($"CC Tracking MMP: GetAnalyticsInstanceIdAsync faulted: {task.Exception}");
+                    yield break;
                 }
-                else if (task.IsCanceled)
-                {
-                    Debug.LogWarning("CC Tracking MMP: GetAnalyticsInstanceIdAsync was canceled.");
-                }
-                else
+                try
                 {
                     _firebaseAppInstanceId = task.Result;
+                } catch (Exception)
+                {
+                    yield break;
                 }
             }
 
