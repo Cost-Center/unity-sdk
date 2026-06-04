@@ -1,12 +1,10 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 #if UNITY_IOS && !UNITY_EDITOR
 using System.Runtime.InteropServices;
 #endif
 using UnityEngine;
 using UnityEngine.Networking;
-using Ugi.PlayInstallReferrerPlugin;
 
 namespace CostCenter.Attribution {
     public class CCTracking
@@ -50,7 +48,6 @@ namespace CostCenter.Attribution {
             }
         }
 
-        private static Dictionary<string, object> _installReferrerInfo = null;
         private static string _idfv = null;
         private static string _firebaseAppInstanceId = string.Empty;
 
@@ -120,21 +117,17 @@ namespace CostCenter.Attribution {
             Firebase.Analytics.FirebaseAnalytics.SetUserProperty("vendor_id", _idfv);
             
             // ANDROID INSTALL REFERRER
-            _installReferrerInfo = null;
-            #if UNITY_ANDROID && !UNITY_EDITOR
-                PlayInstallReferrerAndroid.GetInstallReferrerInfo(InstallReferrerCallback);
-                yield return new WaitUntil(() => _installReferrerInfo != null);
-            #elif UNITY_EDITOR
-                PlayInstallReferrerEditor.GetInstallReferrerInfo(InstallReferrerCallback);
-                yield return new WaitUntil(() => _installReferrerInfo != null);
-            #endif
-            if (_installReferrerInfo != null) {
-                foreach (KeyValuePair<string, object> info in _installReferrerInfo) {
-                    string value = $"{info.Key}" == "install_referrer"
-                        ? UnityWebRequest.EscapeURL(info.Value.ToString())
-                        : info.Value.ToString();
-                    url += $"&{info.Key}={value}";
-                }
+            bool _referrerFetched = false;
+            CCInstallReferrer.Fetch(_ => _referrerFetched = true);
+            yield return new WaitUntil(() => _referrerFetched);
+            var referrerDetails = CCInstallReferrer.Details;
+            if (referrerDetails != null && referrerDetails.Error == null) {
+                if (!string.IsNullOrEmpty(referrerDetails.InstallReferrer))
+                    url += $"&install_referrer={UnityWebRequest.EscapeURL(referrerDetails.InstallReferrer)}";
+                if (referrerDetails.ReferrerClickTimestampServerSeconds != null)
+                    url += $"&click_ts={referrerDetails.ReferrerClickTimestampServerSeconds}";
+                if (referrerDetails.InstallBeginTimestampServerSeconds != null)
+                    url += $"&install_ts={referrerDetails.InstallBeginTimestampServerSeconds}";
             }
 
             // IOS ATTRIBUTION TOKEN
@@ -155,62 +148,6 @@ namespace CostCenter.Attribution {
             } else {
                 Debug.Log("CCAttribution CallAppOpen: success");
             }
-        }
-
-        internal static void InstallReferrerCallback(PlayInstallReferrerDetails installReferrerDetails) {
-            Dictionary<string, object> result = new Dictionary<string, object>();
-            Debug.Log("Install referrer details received!");
-
-            // check for error
-            if (installReferrerDetails.Error != null)
-            {
-                Debug.LogError("Error occurred!");
-                if (installReferrerDetails.Error.Exception != null)
-                {
-                    Debug.LogError("Exception message: " + installReferrerDetails.Error.Exception.Message);
-                }
-                Debug.LogError("Response code: " + installReferrerDetails.Error.ResponseCode.ToString());
-                _installReferrerInfo = result;
-                return;
-            }
-
-            // print install referrer details
-            if (installReferrerDetails.InstallReferrer != null)
-            {
-                result["install_referrer"] = installReferrerDetails.InstallReferrer;
-                Debug.Log("Install referrer: " + installReferrerDetails.InstallReferrer);
-            }
-            // if (installReferrerDetails.ReferrerClickTimestampSeconds != null)
-            // {
-            //     result["click_ts"] = installReferrerDetails.ReferrerClickTimestampSeconds.ToString();
-            //     Debug.Log("Referrer click timestamp: " + installReferrerDetails.ReferrerClickTimestampSeconds);
-            // }
-            // if (installReferrerDetails.InstallBeginTimestampSeconds != null)
-            // {
-            //     result["install_ts"] = installReferrerDetails.InstallBeginTimestampSeconds.ToString();
-            //     Debug.Log("Install begin timestamp: " + installReferrerDetails.InstallBeginTimestampSeconds);
-            // }
-            if (installReferrerDetails.ReferrerClickTimestampServerSeconds != null)
-            {
-                result["click_ts"] = installReferrerDetails.ReferrerClickTimestampServerSeconds.ToString();
-                Debug.Log("Referrer click server timestamp: " + installReferrerDetails.ReferrerClickTimestampServerSeconds);
-            }
-            if (installReferrerDetails.InstallBeginTimestampServerSeconds != null)
-            {
-                result["install_ts"]  = installReferrerDetails.InstallBeginTimestampServerSeconds.ToString();
-                Debug.Log("Install begin server timestamp: " + installReferrerDetails.InstallBeginTimestampServerSeconds);
-            }
-            // if (installReferrerDetails.InstallVersion != null)
-            // {
-            //     result["install_version"] = installReferrerDetails.InstallVersion;
-            //     Debug.Log("Install version: " + installReferrerDetails.InstallVersion);
-            // }
-            // if (installReferrerDetails.GooglePlayInstant != null)
-            // {
-            //     txtGooglePlayInstantFromCallback = installReferrerDetails.GooglePlayInstant.ToString();
-            //     Debug.Log("Google Play instant: " + installReferrerDetails.GooglePlayInstant);
-            // }
-            _installReferrerInfo = result;
         }
 
         internal static IEnumerator TrackATT(string firebaseAppInstanceId = null, float delayTime = 5.0f)

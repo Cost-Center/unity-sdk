@@ -1,5 +1,8 @@
 # Cost Center SDK Change Log
 
+## v1.6.0
+- CCRemoteConfig: support Install Referrer like campaign
+
 ## v1.5.1
 - CCTracking: fix non-fatal tracking
 

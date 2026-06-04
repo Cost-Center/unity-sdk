@@ -36,6 +36,29 @@ namespace CostCenter.RemoteConfig {
         void Awake() {
             instance = this;
             ConversionData = CCConversionData.Load();
+            #if UNITY_ANDROID
+            if (IsOrganicConversionData()) {
+                CCInstallReferrer.Fetch(referrer => {
+                    if (!string.IsNullOrEmpty(referrer))
+                        ApplyInstallReferrerToConversionData(referrer);
+                });
+            }
+            #endif
+        }
+
+        private static bool IsOrganicConversionData() {
+            if (ConversionData == null || ConversionData.Count == 0) return true;
+            if (!ConversionData.TryGetValue("media_source", out var ms)) return true;
+            string mediaSource = ms?.ToString();
+            return string.IsNullOrEmpty(mediaSource) || mediaSource.Equals("organic", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static void ApplyInstallReferrerToConversionData(string referrer) {
+            if (string.IsNullOrEmpty(referrer)) return;
+            ConversionData ??= new Dictionary<string, object>();
+            ConversionData["campaign"] = referrer;
+            ConversionData["campaign_id"] = referrer;
+            CCConversionData.Save(ConversionData);
         }
 
         public void ResetDefaultValues() {
@@ -81,8 +104,16 @@ namespace CostCenter.RemoteConfig {
             }
 
             ConversionData = conversionData;
+            Debug.Log(ConversionData["campaign"]);
 
-            CCConversionData.Save(conversionData);
+            #if UNITY_ANDROID
+            if (IsOrganicConversionData() && !string.IsNullOrEmpty(CCInstallReferrer.Value)) {
+                ConversionData["campaign"] = CCInstallReferrer.Value;
+                ConversionData["campaign_id"] = CCInstallReferrer.Value;
+            }
+            #endif
+
+            CCConversionData.Save(ConversionData);
 
             if (!CCFirebase.IsInitialized)
             {
