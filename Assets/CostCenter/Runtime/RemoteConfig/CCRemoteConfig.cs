@@ -38,9 +38,10 @@ namespace CostCenter.RemoteConfig {
             ConversionData = CCConversionData.Load();
             #if UNITY_ANDROID
             if (IsOrganicConversionData()) {
-                CCInstallReferrer.Fetch(referrer => {
-                    if (!string.IsNullOrEmpty(referrer))
+                CCInstallReferrer.Fetch((referrer) => {
+                    if (!string.IsNullOrEmpty(referrer) && IsOrganicConversionData()) {
                         ApplyInstallReferrerToConversionData(referrer);
+                    }
                 });
             }
             #endif
@@ -56,8 +57,29 @@ namespace CostCenter.RemoteConfig {
         private static void ApplyInstallReferrerToConversionData(string referrer) {
             if (string.IsNullOrEmpty(referrer)) return;
             ConversionData ??= new Dictionary<string, object>();
-            ConversionData["campaign"] = referrer;
-            ConversionData["campaign_id"] = referrer;
+            
+            // Parse query string
+            var parsed = referrer
+                .Split('&')
+                .Select(p => p.Split(new char[]{'='}, 2))
+                .Where(p => p.Length == 2)
+                .ToDictionary(p => Uri.UnescapeDataString(p[0]), 
+                            p => Uri.UnescapeDataString(p[1]));
+
+            // Map utm params → conversion data fields
+            if (parsed.TryGetValue("utm_campaign", out var campaign))
+                ConversionData["campaign"] = campaign;
+
+            if (parsed.TryGetValue("utm_id", out var campaignId))
+                ConversionData["campaign_id"] = campaignId;
+
+            if (parsed.TryGetValue("utm_source", out var source))
+                ConversionData["media_source"] = source;
+
+            if (parsed.TryGetValue("utm_content", out var content))
+                ConversionData["adgroup_id"] = content;
+
+            Debug.Log($"CCRemoteConfig apply referrer: {referrer}");
             CCConversionData.Save(ConversionData);
         }
 
@@ -96,7 +118,7 @@ namespace CostCenter.RemoteConfig {
             }
 
             _isConversionDataGet = true;
-            // Debug.Log("onConversionDataSuccess: " + conversionData);
+            Debug.Log("CCRemoteConfig onConversionDataSuccess: " + conversionData);
 
             if (conversionData == null || conversionData.Count < 1)
             {
@@ -104,14 +126,6 @@ namespace CostCenter.RemoteConfig {
             }
 
             ConversionData = conversionData;
-            Debug.Log(ConversionData["campaign"]);
-
-            #if UNITY_ANDROID
-            if (IsOrganicConversionData() && !string.IsNullOrEmpty(CCInstallReferrer.Value)) {
-                ConversionData["campaign"] = CCInstallReferrer.Value;
-                ConversionData["campaign_id"] = CCInstallReferrer.Value;
-            }
-            #endif
 
             CCConversionData.Save(ConversionData);
 
