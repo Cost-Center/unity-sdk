@@ -37,9 +37,9 @@ namespace CostCenter.RemoteConfig {
             instance = this;
             ConversionData = CCConversionData.Load();
             #if UNITY_ANDROID
-            if (IsOrganicConversionData()) {
+            if (IsOrganicConversionData(ConversionData)) {
                 CCInstallReferrer.Fetch((referrer) => {
-                    if (!string.IsNullOrEmpty(referrer) && IsOrganicConversionData()) {
+                    if (!string.IsNullOrEmpty(referrer) && IsOrganicConversionData(ConversionData)) {
                         ApplyInstallReferrerToConversionData(referrer);
                     }
                 });
@@ -47,9 +47,9 @@ namespace CostCenter.RemoteConfig {
             #endif
         }
 
-        private static bool IsOrganicConversionData() {
-            if (ConversionData == null || ConversionData.Count == 0) return true;
-            if (!ConversionData.TryGetValue("media_source", out var ms)) return true;
+        private static bool IsOrganicConversionData(Dictionary<string, object> cData) {
+            if (cData == null || cData.Count == 0) return true;
+            if (!cData.TryGetValue("media_source", out var ms)) return true;
             string mediaSource = ms?.ToString();
             return string.IsNullOrEmpty(mediaSource) || mediaSource.Equals("organic", StringComparison.OrdinalIgnoreCase);
         }
@@ -67,17 +67,10 @@ namespace CostCenter.RemoteConfig {
                             p => Uri.UnescapeDataString(p[1]));
 
             // Map utm params → conversion data fields
-            if (parsed.TryGetValue("utm_campaign", out var campaign))
-                ConversionData["campaign"] = campaign;
-
-            if (parsed.TryGetValue("utm_id", out var campaignId))
-                ConversionData["campaign_id"] = campaignId;
-
-            if (parsed.TryGetValue("utm_source", out var source))
-                ConversionData["media_source"] = source;
-
-            if (parsed.TryGetValue("utm_content", out var content))
-                ConversionData["adgroup_id"] = content;
+            if (parsed.TryGetValue("rcode", out var rcode)) {
+                ConversionData["media_source"] = rcode;
+                ConversionData["campaign"] = rcode;
+            }
 
             Debug.Log($"CCRemoteConfig apply referrer: {referrer}");
             CCConversionData.Save(ConversionData);
@@ -125,7 +118,15 @@ namespace CostCenter.RemoteConfig {
                 return;
             }
 
-            ConversionData = conversionData;
+            if (IsOrganicConversionData(conversionData) && !IsOrganicConversionData(ConversionData)) {
+                foreach (var pair in conversionData) {
+                    if (!ConversionData.ContainsKey(pair.Key))
+                        ConversionData[pair.Key] = pair.Value;
+                }
+            } else {
+                // AF non-organic → AF thắng hoàn toàn
+                ConversionData = conversionData;
+            }
 
             CCConversionData.Save(ConversionData);
 
