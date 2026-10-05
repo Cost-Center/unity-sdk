@@ -1,5 +1,8 @@
 # Cost Center SDK Change Log
 
+## v1.6.1
+- CCRemoteConfig: fix bug campaign/campaign_id is null or empty
+
 ## v1.6.0
 - CCRemoteConfig: support Install Referrer like campaign
 

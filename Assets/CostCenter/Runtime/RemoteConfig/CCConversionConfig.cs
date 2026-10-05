@@ -66,7 +66,15 @@ namespace CostCenter.RemoteConfig {
 
             return mappedData;
         }
-        
+
+        /// <summary>
+        /// Compares config value with conversion value as string (conversion value may be non-string, e.g. long)
+        /// </summary>
+        private static bool IsMatchValue(string configValue, object conversionValue)
+        {
+            return !string.IsNullOrEmpty(configValue) && configValue == conversionValue?.ToString();
+        }
+
         public bool IsMapWithConversionData(Dictionary<string, object> conversionData)
         {
             // Automatically map conversion data from any MMP format to AppsFlyer format
@@ -77,38 +85,24 @@ namespace CostCenter.RemoteConfig {
                 return false;
             }
 
+            // Match by campaign OR campaign_id (fields left empty in config are ignored)
             if (!string.IsNullOrEmpty(campaign) || !string.IsNullOrEmpty(campaign_id))
             {
-                object conversionCampaign = mappedConversionData.GetValueOrDefault("campaign", null);
-                object conversionCampaignId = mappedConversionData.GetValueOrDefault("campaign_id", null);
                 if (
-                    (
-                        (string.IsNullOrEmpty(campaign) && (conversionCampaign == null || string.IsNullOrEmpty(conversionCampaign.ToString())))
-                        || (campaign != null && !campaign.Equals(conversionCampaign))
-                    )
-                    && (
-                        (string.IsNullOrEmpty(campaign_id) && (conversionCampaignId == null || string.IsNullOrEmpty(conversionCampaignId.ToString())))
-                        || (campaign_id != null && !campaign_id.Equals(conversionCampaignId))
-                    )
+                    !IsMatchValue(campaign, mappedConversionData.GetValueOrDefault("campaign", null))
+                    && !IsMatchValue(campaign_id, mappedConversionData.GetValueOrDefault("campaign_id", null))
                 )
                 {
                     return false;
                 }
             }
 
+            // Match by adset OR adset_id (fields left empty in config are ignored)
             if (!string.IsNullOrEmpty(adset) || !string.IsNullOrEmpty(adset_id))
             {
-                object conversionAdset = mappedConversionData.GetValueOrDefault("adset", null);
-                object conversionAdsetId = mappedConversionData.GetValueOrDefault("adset_id", null);
                 if (
-                    (
-                        (string.IsNullOrEmpty(adset) && (conversionAdset == null || string.IsNullOrEmpty(conversionAdset.ToString())))
-                        || (adset != null && !adset.Equals(conversionAdset))
-                    )
-                    && (
-                        (string.IsNullOrEmpty(adset_id) && (conversionAdsetId == null || string.IsNullOrEmpty(conversionAdsetId.ToString())))
-                        || (adset_id != null && !adset_id.Equals(conversionAdsetId))
-                    )
+                    !IsMatchValue(adset, mappedConversionData.GetValueOrDefault("adset", null))
+                    && !IsMatchValue(adset_id, mappedConversionData.GetValueOrDefault("adset_id", null))
                 )
                 {
                     return false;
@@ -117,7 +111,7 @@ namespace CostCenter.RemoteConfig {
 
             if (!string.IsNullOrEmpty(adgroup_id))
             {
-                if (!adgroup_id.Equals(mappedConversionData.GetValueOrDefault("adgroup_id", string.Empty)))
+                if (!IsMatchValue(adgroup_id, mappedConversionData.GetValueOrDefault("adgroup_id", null)))
                 {
                     return false;
                 }
@@ -125,7 +119,7 @@ namespace CostCenter.RemoteConfig {
 
             if (!string.IsNullOrEmpty(media_source))
             {
-                if (!media_source.Equals(mappedConversionData.GetValueOrDefault("media_source", string.Empty)))
+                if (!IsMatchValue(media_source, mappedConversionData.GetValueOrDefault("media_source", null)))
                 {
                     return false;
                 }
@@ -133,7 +127,7 @@ namespace CostCenter.RemoteConfig {
 
             if (!string.IsNullOrEmpty(install_time))
             {
-                if (!install_time.Equals(mappedConversionData.GetValueOrDefault("install_time", string.Empty)))
+                if (!IsMatchValue(install_time, mappedConversionData.GetValueOrDefault("install_time", null)))
                 {
                     return false;
                 }
@@ -141,7 +135,7 @@ namespace CostCenter.RemoteConfig {
 
             if (!string.IsNullOrEmpty(af_siteid))
             {
-                if (!af_siteid.Equals(mappedConversionData.GetValueOrDefault("af_siteid", string.Empty)))
+                if (!IsMatchValue(af_siteid, mappedConversionData.GetValueOrDefault("af_siteid", null)))
                 {
                     return false;
                 }
